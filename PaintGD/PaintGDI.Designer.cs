@@ -37,6 +37,9 @@
             button1 = new Button();
             button2 = new Button();
             panel1 = new Panel();
+            label2 = new Label();
+            radioButton5 = new RadioButton();
+            label3 = new Label();
             SuspendLayout();
             // 
             // DrawSquare
@@ -95,9 +98,9 @@
             // button1
             // 
             button1.BackColor = SystemColors.Window;
-            button1.Location = new Point(51, 214);
+            button1.Location = new Point(62, 328);
             button1.Name = "button1";
-            button1.Size = new Size(94, 29);
+            button1.Size = new Size(92, 29);
             button1.TabIndex = 6;
             button1.Text = "Color";
             button1.UseVisualStyleBackColor = false;
@@ -105,9 +108,9 @@
             // 
             // button2
             // 
-            button2.Location = new Point(51, 249);
+            button2.Location = new Point(62, 293);
             button2.Name = "button2";
-            button2.Size = new Size(94, 29);
+            button2.Size = new Size(92, 29);
             button2.TabIndex = 7;
             button2.Text = "Clear";
             button2.UseVisualStyleBackColor = true;
@@ -125,11 +128,43 @@
             panel1.MouseMove += Mouse_Move;
             panel1.MouseUp += Mouse_Up;
             // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(46, 256);
+            label2.Name = "label2";
+            label2.Size = new Size(58, 20);
+            label2.TabIndex = 9;
+            label2.Text = "Actions";
+            // 
+            // radioButton5
+            // 
+            radioButton5.AutoSize = true;
+            radioButton5.Location = new Point(62, 218);
+            radioButton5.Name = "radioButton5";
+            radioButton5.Size = new Size(115, 24);
+            radioButton5.TabIndex = 10;
+            radioButton5.TabStop = true;
+            radioButton5.Text = "Select Shape";
+            radioButton5.UseVisualStyleBackColor = true;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(46, 186);
+            label3.Name = "label3";
+            label3.Size = new Size(51, 20);
+            label3.TabIndex = 11;
+            label3.Text = "Cursor";
+            // 
             // PaintGDI
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1151, 760);
+            Controls.Add(label3);
+            Controls.Add(radioButton5);
+            Controls.Add(label2);
             Controls.Add(panel1);
             Controls.Add(button2);
             Controls.Add(button1);
@@ -155,5 +190,8 @@
         private Button button1;
         private Button button2;
         private Panel panel1;
+        private Label label2;
+        private RadioButton radioButton5;
+        private Label label3;
     }
 }

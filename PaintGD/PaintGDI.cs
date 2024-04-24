@@ -1,14 +1,16 @@
+using PaintGD.Model;
+
 namespace PaintGD
 {
     public partial class PaintGDI : Form
     {
-        List<Shape> allShapes;
-        Rectangle curShape;
+        List<IShape> allShapes;
+        IShape curShape;
         Graphics g;
         Pen p;
 
-        Point StartLocation;
-        Point EndLocation;
+        Point startLocation;
+        Point endLocation;
 
         bool isMouseDown = false;
         public PaintGDI()
@@ -16,36 +18,55 @@ namespace PaintGD
             InitializeComponent();
             g = panel1.CreateGraphics();
             p = new Pen(Color.Black, 3);
-            allShapes = new List<Shape>();
+            allShapes = new List<IShape>();
         }
 
         private void Mouse_Down(object sender, MouseEventArgs e)
         {
             isMouseDown = true;
-            StartLocation = e.Location;
+            startLocation = e.Location;
         }
 
         private void Mouse_Move(object sender, MouseEventArgs e)
         {
             if (isMouseDown)
             {
-                EndLocation = e.Location;
+                endLocation = e.Location;
 
-                // Calculate the dimensions of the square
-                int width = EndLocation.X - StartLocation.X;
-                int height = EndLocation.Y - StartLocation.Y;
-
-                // Decide which is the curShape of the updating form
                 if (DrawCircle.Checked)
                 {
+                    int width = endLocation.X - startLocation.X;
+                    int height = endLocation.Y - startLocation.Y;
+
+                    curShape = new EllipseShape(startLocation.X, startLocation.Y, width, height);
                 }
                 else if (DrawLine.Checked)
                 {
+                    curShape = new LineShape(startLocation.X, startLocation.Y, endLocation.X, endLocation.Y);
                 }
                 else if (DrawSquare.Checked)
                 {
-                    // Update the curShape to show the preview
-                    curShape = new Rectangle(StartLocation.X, StartLocation.Y, width, height);
+                    int width = Math.Abs(endLocation.X - startLocation.X);
+                    int height = Math.Abs(endLocation.Y - startLocation.Y);
+
+                    // Ensure that the width and height are positive
+                    int x = Math.Min(startLocation.X, endLocation.X);
+                    int y = Math.Min(startLocation.Y, endLocation.Y);
+
+                    curShape = new SquareShape(x, y, width, height);
+                }
+                else if (DrawTriangle.Checked)
+                {
+                    var sideOfPerfectTriangle = endLocation.X - startLocation.X;
+
+                    // The height will always be upwards
+                    double height = Math.Abs(sideOfPerfectTriangle * Math.Sqrt(3) / 2);
+
+                    // If we start drawing the triangle backwards we need to handle the position of the topX
+                    int topX = startLocation.X + sideOfPerfectTriangle / 2;
+                    var topY = startLocation.Y - (int)height;
+
+                    curShape = new TriangleShape(startLocation.X, startLocation.Y, endLocation.X, startLocation.Y, topX, topY);
                 }
 
                 // Redraw the panel to display the updated preview
@@ -57,23 +78,42 @@ namespace PaintGD
         {
             if (isMouseDown)
             {
-                EndLocation = e.Location;
+                endLocation = e.Location;
 
-                // Update the curShape with the final dimensions
-                int width = EndLocation.X - StartLocation.X;
-                int height = EndLocation.Y - StartLocation.Y;
-
-                // Decide which is the curShape of the final form
                 if (DrawCircle.Checked)
                 {
+                    int width = endLocation.X - startLocation.X;
+                    int height = endLocation.Y - startLocation.Y;
+
+                    curShape = new EllipseShape(startLocation.X, startLocation.Y, width, height);
                 }
                 else if (DrawLine.Checked)
                 {
+                    curShape = new LineShape(startLocation.X, startLocation.Y, endLocation.X, endLocation.Y);
                 }
                 else if (DrawSquare.Checked)
                 {
-                    // Update the curShape to show the preview
-                    curShape = new Rectangle(StartLocation.X, StartLocation.Y, width, height);
+                    int width = Math.Abs(endLocation.X - startLocation.X);
+                    int height = Math.Abs(endLocation.Y - startLocation.Y);
+
+                    // Ensure that the width and height are positive
+                    int x = Math.Min(startLocation.X, endLocation.X);
+                    int y = Math.Min(startLocation.Y, endLocation.Y);
+
+                    curShape = new SquareShape(x, y, width, height);
+                }
+                else if (DrawTriangle.Checked)
+                {
+                    var sideOfPerfectTriangle = endLocation.X - startLocation.X;
+
+                    // The height will always be upwards
+                    double height = Math.Abs(sideOfPerfectTriangle * Math.Sqrt(3) / 2);
+
+                    // If we start drawing the triangle backwards we need to handle the position of the topX
+                    int topX = startLocation.X + sideOfPerfectTriangle / 2;
+                    var topY = startLocation.Y - (int)height;
+
+                    curShape = new TriangleShape(startLocation.X, startLocation.Y, endLocation.X, startLocation.Y, topX, topY);
                 }
 
                 // Redraw the panel to display the final curShape
@@ -101,18 +141,9 @@ namespace PaintGD
         {
             if (curShape != null)
             {
-                // Draw the curShape with the specified pen
-                if (DrawCircle.Checked)
-                {
-                }
-                else if (DrawLine.Checked)
-                {
-                }
-                else if (DrawSquare.Checked)
-                {
-                    e.Graphics.DrawRectangle(p, curShape);
-                }
+                curShape.DrawShape(e.Graphics, p);
             }
         }
+
     }
 }

@@ -13,7 +13,7 @@ namespace PaintGD.Model
 
         public LineShape(int x, int y, int x1, int y1)
         {
-            _points = new List<Point>() { new Point(x, y), new Point(x1 - x, y1 - y)};
+            _points = new List<Point>() { new Point(x, y), new Point(x1, y1)};
         }
 
         public void DrawShape(Graphics g, Pen p)

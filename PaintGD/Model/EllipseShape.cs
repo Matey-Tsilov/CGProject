@@ -12,10 +12,10 @@ namespace PaintGD.Model
         private List<Point> _points;
         public IReadOnlyCollection<Point> Points { get => _points.AsReadOnly(); }
 
-        public EllipseShape(int x, int y, int x1, int y1)
+        public EllipseShape(int x, int y, int width, int height)
         {
-            _points = new List<Point>() { new Point(x, y), new Point(x1 - x, y1 - y)};
-            shape = new Rectangle(x, y, x1, y1);
+            _points = new List<Point>() { new Point(x, y), new Point(x + width, y + height) };
+            shape = new Rectangle(x, y, width, height);
         }
 
         public void DrawShape(Graphics g, Pen p)
