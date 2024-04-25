@@ -68,6 +68,37 @@ namespace PaintGD
 
                     curShape = new TriangleShape(startLocation.X, startLocation.Y, endLocation.X, startLocation.Y, topX, topY);
                 }
+                else if (DrawTrapezoid.Checked)
+                {
+                    // This is hard-coded, we need to adjust it based on the trapezoid
+                    int upperIndednt = Math.Abs(endLocation.X - startLocation.X) / 4;
+
+                    // Because we want backwards compatibility we need to have both the 
+                    // Start and End locations and decide which should be the left and right one
+
+                    // Left Down Corner
+                    int ldcX = Math.Min(startLocation.X, endLocation.X);
+                    int ldcY = startLocation.Y;
+
+                    // Right Down Corner
+                    int rdcX = Math.Max(startLocation.X, endLocation.X);
+                    int rdcY = startLocation.Y;
+
+                    // Left Upper Corner    
+                    int lucX = rdcX - upperIndednt;
+                    int lucY = startLocation.Y - upperIndednt * 2;
+
+                    // Right Upper Corner
+                    int rucX = ldcX + upperIndednt;
+                    int rucY = startLocation.Y - upperIndednt * 2;
+
+                    curShape = new TrapezoidShape(
+                        ldcX, ldcY,
+                        rdcX, rdcY,
+                        lucX, lucY,
+                        rucX, rucY
+                    );
+                }
 
                 // Redraw the panel to display the updated preview
                 panel1.Invalidate();
@@ -115,6 +146,37 @@ namespace PaintGD
 
                     curShape = new TriangleShape(startLocation.X, startLocation.Y, endLocation.X, startLocation.Y, topX, topY);
                 }
+                else if (DrawTrapezoid.Checked)
+                {
+                    // This is hard-coded, we need to adjust it based on the trapezoid
+                    int upperIndednt = Math.Abs(endLocation.X - startLocation.X) / 4;
+
+                    // Because we want backwards compatibility we need to have both the 
+                    // Start and End locations and decide which should be the left and right one
+
+                    // Left Down Corner
+                    int ldcX = Math.Min(startLocation.X, endLocation.X);
+                    int ldcY = startLocation.Y;
+
+                    // Right Down Corner
+                    int rdcX = Math.Max(startLocation.X, endLocation.X);
+                    int rdcY = startLocation.Y;
+
+                    // Left Upper Corner    
+                    int lucX = rdcX - upperIndednt;
+                    int lucY = startLocation.Y - upperIndednt * 2;
+
+                    // Right Upper Corner
+                    int rucX = ldcX + upperIndednt;
+                    int rucY = startLocation.Y - upperIndednt * 2;
+
+                    curShape = new TrapezoidShape(
+                        ldcX, ldcY,
+                        rdcX, rdcY,
+                        lucX, lucY,
+                        rucX, rucY
+                    );
+                }
 
                 // Redraw the panel to display the final curShape
                 panel1.Invalidate();
@@ -144,6 +206,5 @@ namespace PaintGD
                 curShape.DrawShape(e.Graphics, p);
             }
         }
-
     }
 }

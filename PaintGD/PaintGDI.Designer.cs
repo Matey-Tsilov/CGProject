@@ -40,6 +40,7 @@
             label2 = new Label();
             radioButton5 = new RadioButton();
             label3 = new Label();
+            DrawTrapezoid = new RadioButton();
             SuspendLayout();
             // 
             // DrawSquare
@@ -98,7 +99,7 @@
             // button1
             // 
             button1.BackColor = SystemColors.Window;
-            button1.Location = new Point(62, 328);
+            button1.Location = new Point(62, 360);
             button1.Name = "button1";
             button1.Size = new Size(92, 29);
             button1.TabIndex = 6;
@@ -108,7 +109,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(62, 293);
+            button2.Location = new Point(62, 325);
             button2.Name = "button2";
             button2.Size = new Size(92, 29);
             button2.TabIndex = 7;
@@ -131,7 +132,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(46, 256);
+            label2.Location = new Point(46, 284);
             label2.Name = "label2";
             label2.Size = new Size(58, 20);
             label2.TabIndex = 9;
@@ -140,7 +141,7 @@
             // radioButton5
             // 
             radioButton5.AutoSize = true;
-            radioButton5.Location = new Point(62, 218);
+            radioButton5.Location = new Point(62, 248);
             radioButton5.Name = "radioButton5";
             radioButton5.Size = new Size(115, 24);
             radioButton5.TabIndex = 10;
@@ -151,17 +152,29 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(46, 186);
+            label3.Location = new Point(46, 216);
             label3.Name = "label3";
             label3.Size = new Size(51, 20);
             label3.TabIndex = 11;
             label3.Text = "Cursor";
+            // 
+            // DrawTrapezoid
+            // 
+            DrawTrapezoid.AutoSize = true;
+            DrawTrapezoid.Location = new Point(62, 178);
+            DrawTrapezoid.Name = "DrawTrapezoid";
+            DrawTrapezoid.Size = new Size(96, 24);
+            DrawTrapezoid.TabIndex = 13;
+            DrawTrapezoid.TabStop = true;
+            DrawTrapezoid.Text = "Trapezoid";
+            DrawTrapezoid.UseVisualStyleBackColor = true;
             // 
             // PaintGDI
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1151, 760);
+            Controls.Add(DrawTrapezoid);
             Controls.Add(label3);
             Controls.Add(radioButton5);
             Controls.Add(label2);
@@ -193,5 +206,6 @@
         private Label label2;
         private RadioButton radioButton5;
         private Label label3;
+        private RadioButton DrawTrapezoid;
     }
 }
