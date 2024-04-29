@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing.Drawing2D;
 
 namespace PaintGD.Model
 {
@@ -11,6 +7,7 @@ namespace PaintGD.Model
         private Rectangle shape;
         private List<Point> _points;
         public IReadOnlyCollection<Point> Points { get => _points.AsReadOnly(); }
+        public bool IsSelected { get; set; } = false;
 
         public EllipseShape(int x, int y, int width, int height)
         {
@@ -21,6 +18,22 @@ namespace PaintGD.Model
         public void DrawShape(Graphics g, Pen p)
         {
             g.DrawEllipse(p, shape);
+        }
+        public void SelectShape(Graphics g)
+        {
+            g.DrawRectangle(new Pen(Color.CadetBlue, 5), shape);
+        }
+        public bool IsInBounds(Point click)
+        {
+            // Create a GraphicsPath object
+            using (GraphicsPath path = new GraphicsPath())
+            {
+                // Add the polygon points to the path
+                path.AddPolygon(_points.Select(p => new PointF(p.X, p.Y)).ToArray());
+
+                // Check if the point is inside the bounds of the polygon
+                return path.IsVisible(click);
+            }
         }
     }
 }

@@ -38,7 +38,7 @@
             button2 = new Button();
             panel1 = new Panel();
             label2 = new Label();
-            radioButton5 = new RadioButton();
+            SelectShape = new RadioButton();
             label3 = new Label();
             DrawTrapezoid = new RadioButton();
             SuspendLayout();
@@ -138,16 +138,16 @@
             label2.TabIndex = 9;
             label2.Text = "Actions";
             // 
-            // radioButton5
+            // SelectShape
             // 
-            radioButton5.AutoSize = true;
-            radioButton5.Location = new Point(62, 248);
-            radioButton5.Name = "radioButton5";
-            radioButton5.Size = new Size(115, 24);
-            radioButton5.TabIndex = 10;
-            radioButton5.TabStop = true;
-            radioButton5.Text = "Select Shape";
-            radioButton5.UseVisualStyleBackColor = true;
+            SelectShape.AutoSize = true;
+            SelectShape.Location = new Point(62, 248);
+            SelectShape.Name = "SelectShape";
+            SelectShape.Size = new Size(115, 24);
+            SelectShape.TabIndex = 10;
+            SelectShape.TabStop = true;
+            SelectShape.Text = "Select Shape";
+            SelectShape.UseVisualStyleBackColor = true;
             // 
             // label3
             // 
@@ -176,7 +176,7 @@
             ClientSize = new Size(1151, 760);
             Controls.Add(DrawTrapezoid);
             Controls.Add(label3);
-            Controls.Add(radioButton5);
+            Controls.Add(SelectShape);
             Controls.Add(label2);
             Controls.Add(panel1);
             Controls.Add(button2);
@@ -186,6 +186,7 @@
             Controls.Add(DrawTriangle);
             Controls.Add(DrawCircle);
             Controls.Add(DrawSquare);
+            DoubleBuffered = true;
             Name = "PaintGDI";
             Text = "PaintGDI";
             ResumeLayout(false);
@@ -204,7 +205,7 @@
         private Button button2;
         private Panel panel1;
         private Label label2;
-        private RadioButton radioButton5;
+        private RadioButton SelectShape;
         private Label label3;
         private RadioButton DrawTrapezoid;
     }
