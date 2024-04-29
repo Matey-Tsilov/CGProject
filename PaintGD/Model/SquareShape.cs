@@ -1,6 +1,4 @@
-﻿using System.Drawing.Drawing2D;
-
-namespace PaintGD.Model
+﻿namespace PaintGD.Model
 {
     public class SquareShape : IShape
     {
@@ -22,21 +20,16 @@ namespace PaintGD.Model
 
         public void SelectShape(Graphics g)
         {
-            g.DrawRectangle(new Pen(Color.CadetBlue, 5), shape);
-            IsSelected = true;
+            // Toggle button for selecting an element
+            this.IsSelected = !this.IsSelected;
+
+            g.DrawRectangle(new Pen(Color.Blue, 5), shape);
         }
 
         public bool IsInBounds(Point click)
         {
-            // Create a GraphicsPath object
-            using (GraphicsPath path = new GraphicsPath())
-            {
-                // Add the polygon points to the path
-                path.AddPolygon(_points.Select(p => new PointF(p.X, p.Y)).ToArray());
-
-                // Check if the point is inside the bounds of the polygon
-                return path.IsVisible(click);
-            }
+            // return if the click is inside the rectangle or not!
+            return shape.Contains(click);
         }
     }
 }

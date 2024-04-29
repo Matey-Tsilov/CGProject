@@ -21,8 +21,15 @@ namespace PaintGD.Model
 
         public void SelectShape(Graphics g)
         {
-            var selectRect = new Rectangle(_points[0].X, _points[0].Y, Math.Abs(_points[1].X - _points[0].X), Math.Abs(_points[2].Y - _points[1].Y));
-            g.DrawRectangle(new Pen(Color.CadetBlue, 5), selectRect);
+            // Toggle button for selecting an element
+            this.IsSelected = !this.IsSelected;
+
+            var selectRect = new Rectangle(
+                _points[0].X, _points[3].Y, 
+                Math.Abs(_points[1].X - _points[0].X), 
+                Math.Abs(_points[1].Y - _points[2].Y));
+
+            g.DrawRectangle(new Pen(Color.Blue, 5), selectRect);
         }
 
         public bool IsInBounds(Point click)

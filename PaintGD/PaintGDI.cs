@@ -32,17 +32,44 @@ namespace PaintGD
                 if (allShapes.Count > 0)
                 {
                     // If not then we select the most recent record in whose Bounds we currently clicked
-                    
+                    allShapes.Reverse();
+
+                    // We get the current shape and select it
+                    var selectedShape = allShapes.FirstOrDefault(s => s.IsInBounds(startLocation));
+
+                    // This is the toggle select functionality
+                    if (selectedShape != null) 
+                    {
+                        if (!selectedShape.IsSelected)
+                        {
+                            // If we have several shapes one onto another we will first select them all before unselecting only top layer!
+                            selectedShape.SelectShape(g);
+                        }
+                        else
+                        {
+                            // We do it manually from here since we don't have a deselect method made for the public
+                            selectedShape.IsSelected = false;
+
+                            // Because we didn't add the highlight in the array it won't persist so a simple refresh fixes the highlight
+                            panel1.Refresh();
+                        }
+
+                    }
+
+                    // Fix the order of the elements
+                    allShapes.Reverse();
                 }
             }
         }
 
         private void Mouse_Move(object sender, MouseEventArgs e)
         {
+            // The second part we have in cases where we drag or resize elements
             if (isMouseDown)
             {
                 endLocation = e.Location;
 
+                // We handle this specific case, to allow resizing and dragging
                 if (SelectShape.Checked)
                 {
 
@@ -58,7 +85,9 @@ namespace PaintGD
                     }
                     else if (DrawLine.Checked)
                     {
-                        curShape = new LineShape(startLocation.X, startLocation.Y, endLocation.X, endLocation.Y);
+                        LineShape line = new LineShape(startLocation.X, startLocation.Y, endLocation.X, endLocation.Y);
+                        curShape = line;
+                        line.linePoints.Add(endLocation);
                     }
                     else if (DrawSquare.Checked)
                     {
@@ -123,10 +152,12 @@ namespace PaintGD
 
         private void Mouse_Up(object sender, MouseEventArgs e)
         {
+            // The second part we have in cases where we drag or resize elements
             if (isMouseDown)
             {
                 endLocation = e.Location;
 
+                // We handle this specific case, to allow resizing and dragging
                 if (SelectShape.Checked)
                 {
 
@@ -142,7 +173,9 @@ namespace PaintGD
                     }
                     else if (DrawLine.Checked)
                     {
-                        curShape = new LineShape(startLocation.X, startLocation.Y, endLocation.X, endLocation.Y);
+                        LineShape line = new LineShape(startLocation.X, startLocation.Y, endLocation.X, endLocation.Y);
+                        curShape = line;
+                        line.linePoints.Add(endLocation);
                     }
                     else if (DrawSquare.Checked)
                     {
@@ -202,14 +235,14 @@ namespace PaintGD
 
                     // Add the current shape to the Array to persist
                     allShapes.Add(curShape);
-                    isMouseDown = false;
 
                     panel1.Refresh();
                 }
+
+              isMouseDown = false;
                 
             }
         }
-
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -222,6 +255,12 @@ namespace PaintGD
         {
             Graphics g = panel1.CreateGraphics();
             g.Clear(Color.White);
+
+            // Make all shapes disappear
+            allShapes.Clear();
+            curShape = null;
+
+            panel1.Refresh();
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
@@ -237,7 +276,19 @@ namespace PaintGD
             {
                 // We exclude the already redrawn shape, and redraw the others
                 var shapesLeftToBeRedrawn = allShapes.Where(shape => shape != curShape).ToList();
-                shapesLeftToBeRedrawn.ForEach(cur => cur.DrawShape(e.Graphics, p));
+                shapesLeftToBeRedrawn.ForEach(cur => 
+                {
+                    // We have a special treatment for the selected shapes between renders, for them to persist
+                    if (cur.IsSelected)
+                    {
+                        // TODO: Fix the rectangle highlight to persist, not only shape color of highlight
+                        cur.DrawShape(e.Graphics, new Pen(Color.Blue, 5));
+                    }
+                    else
+                    {
+                        cur.DrawShape(e.Graphics, p);
+                    }
+                });
             }
         }
     }
