@@ -85,9 +85,7 @@ namespace PaintGD
                     }
                     else if (DrawLine.Checked)
                     {
-                        LineShape line = new LineShape(startLocation.X, startLocation.Y, endLocation.X, endLocation.Y);
-                        curShape = line;
-                        line.linePoints.Add(endLocation);
+                        curShape = new LineShape(startLocation.X, startLocation.Y, endLocation.X, endLocation.Y);
                     }
                     else if (DrawSquare.Checked)
                     {
@@ -173,9 +171,7 @@ namespace PaintGD
                     }
                     else if (DrawLine.Checked)
                     {
-                        LineShape line = new LineShape(startLocation.X, startLocation.Y, endLocation.X, endLocation.Y);
-                        curShape = line;
-                        line.linePoints.Add(endLocation);
+                        curShape = new LineShape(startLocation.X, startLocation.Y, endLocation.X, endLocation.Y);
                     }
                     else if (DrawSquare.Checked)
                     {
@@ -282,8 +278,8 @@ namespace PaintGD
                     // We have a special treatment for the selected shapes between renders, for them to persist
                     if (cur.IsSelected)
                     {
-                        // TODO: Fix the rectangle highlight to persist, not only shape color of highlight
-                        cur.DrawShape(e.Graphics, new Pen(Color.Blue, 5));
+                        // TODO: Fix the trapezoid highlight to persist, not only shape color of highlight
+                        cur.DrawShape(e.Graphics, new Pen(Color.Blue, 3));
                     }
                     else
                     {
