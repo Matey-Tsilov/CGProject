@@ -6,6 +6,7 @@
         private List<Point> _points;
         public IReadOnlyCollection<Point> Points { get => _points.AsReadOnly(); }
         public bool IsSelected { get; set; } = false;
+        public Pen drawnPen { get; set; }
 
         public SquareShape(int x, int y, int width, int height)
         {
@@ -16,6 +17,9 @@
         public void DrawShape(Graphics g, Pen p)
         {
             g.DrawRectangle(p, shape);
+
+            // We memorize the color and width of the drawn shape
+            drawnPen = p;
         }
 
         public void SelectShape(Graphics g)

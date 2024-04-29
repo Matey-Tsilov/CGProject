@@ -17,7 +17,7 @@ namespace PaintGD
         {
             InitializeComponent();
             g = panel1.CreateGraphics();
-            p = new Pen(Color.Black, 3);
+            p = new Pen(colorDialog1.Color, trackBar1.Value);
             allShapes = new List<IShape>();
         }
 
@@ -38,7 +38,7 @@ namespace PaintGD
                     var selectedShape = allShapes.FirstOrDefault(s => s.IsInBounds(startLocation));
 
                     // This is the toggle select functionality
-                    if (selectedShape != null) 
+                    if (selectedShape != null)
                     {
                         if (!selectedShape.IsSelected)
                         {
@@ -239,8 +239,8 @@ namespace PaintGD
                     panel1.Refresh();
                 }
 
-              isMouseDown = false;
-                
+                isMouseDown = false;
+
             }
         }
 
@@ -268,7 +268,7 @@ namespace PaintGD
             // We leave this block to have rendering of the shape currently being drawn, after Mouse_Move event
             if (curShape != null)
             {
-                curShape.DrawShape(e.Graphics, p);
+                curShape.DrawShape(e.Graphics, new Pen(colorDialog1.Color, trackBar1.Value));
             }
 
             // We want to redraw the other drawings after adding the current one
@@ -276,7 +276,8 @@ namespace PaintGD
             {
                 // We exclude the already redrawn shape, and redraw the others
                 var shapesLeftToBeRedrawn = allShapes.Where(shape => shape != curShape).ToList();
-                shapesLeftToBeRedrawn.ForEach(cur => 
+
+                shapesLeftToBeRedrawn.ForEach(cur =>
                 {
                     // We have a special treatment for the selected shapes between renders, for them to persist
                     if (cur.IsSelected)
@@ -286,10 +287,16 @@ namespace PaintGD
                     }
                     else
                     {
-                        cur.DrawShape(e.Graphics, p);
+                        // We can access the drawnPen property as this won't be the first time they are redrawn = they have it set!
+                        cur.DrawShape(e.Graphics, cur.drawnPen);
                     }
                 });
             }
+        }
+
+        private void trackBar1_Scroll(object sender, EventArgs e)
+        {
+            p.Width = trackBar1.Value;
         }
     }
 }

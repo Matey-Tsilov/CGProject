@@ -7,6 +7,7 @@ namespace PaintGD.Model
         private List<Point> _points;
         public IReadOnlyCollection<Point> Points { get => _points.AsReadOnly(); }
         public bool IsSelected { get; set; } = false;
+        public Pen drawnPen { get; set; }
 
         public TrapezoidShape(int x, int y, int x1, int y1,int x2, int y2, int x3, int y3)
         {
@@ -17,6 +18,9 @@ namespace PaintGD.Model
         {
             PointF[] pointsF = _points.Select(p => new PointF(p.X, p.Y)).ToArray();
             g.DrawPolygon(p, pointsF);
+
+            // We memorize the color and width of the drawn shape
+            drawnPen = p;
         }
 
         public void SelectShape(Graphics g)

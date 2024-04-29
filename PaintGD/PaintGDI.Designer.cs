@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             DrawSquare = new RadioButton();
             DrawCircle = new RadioButton();
             DrawTriangle = new RadioButton();
@@ -41,6 +42,11 @@
             SelectShape = new RadioButton();
             label3 = new Label();
             DrawTrapezoid = new RadioButton();
+            trackBar1 = new TrackBar();
+            ThicknessLevel = new Label();
+            bindingSource1 = new BindingSource(components);
+            ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)bindingSource1).BeginInit();
             SuspendLayout();
             // 
             // DrawSquare
@@ -99,7 +105,7 @@
             // button1
             // 
             button1.BackColor = SystemColors.Window;
-            button1.Location = new Point(62, 360);
+            button1.Location = new Point(62, 352);
             button1.Name = "button1";
             button1.Size = new Size(92, 29);
             button1.TabIndex = 6;
@@ -109,7 +115,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(62, 325);
+            button2.Location = new Point(62, 317);
             button2.Name = "button2";
             button2.Size = new Size(92, 29);
             button2.TabIndex = 7;
@@ -132,7 +138,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(46, 284);
+            label2.Location = new Point(46, 285);
             label2.Name = "label2";
             label2.Size = new Size(58, 20);
             label2.TabIndex = 9;
@@ -169,11 +175,32 @@
             DrawTrapezoid.Text = "Trapezoid";
             DrawTrapezoid.UseVisualStyleBackColor = true;
             // 
+            // trackBar1
+            // 
+            trackBar1.Location = new Point(12, 426);
+            trackBar1.Minimum = 1;
+            trackBar1.Name = "trackBar1";
+            trackBar1.Size = new Size(185, 56);
+            trackBar1.TabIndex = 14;
+            trackBar1.Value = 3;
+            trackBar1.Scroll += trackBar1_Scroll;
+            // 
+            // ThicknessLevel
+            // 
+            ThicknessLevel.AutoSize = true;
+            ThicknessLevel.Location = new Point(46, 394);
+            ThicknessLevel.Name = "ThicknessLevel";
+            ThicknessLevel.Size = new Size(71, 20);
+            ThicknessLevel.TabIndex = 15;
+            ThicknessLevel.Text = "Thickness";
+            // 
             // PaintGDI
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1151, 760);
+            Controls.Add(ThicknessLevel);
+            Controls.Add(trackBar1);
             Controls.Add(DrawTrapezoid);
             Controls.Add(label3);
             Controls.Add(SelectShape);
@@ -189,6 +216,8 @@
             DoubleBuffered = true;
             Name = "PaintGDI";
             Text = "PaintGDI";
+            ((System.ComponentModel.ISupportInitialize)trackBar1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)bindingSource1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -208,5 +237,8 @@
         private RadioButton SelectShape;
         private Label label3;
         private RadioButton DrawTrapezoid;
+        private TrackBar trackBar1;
+        private Label ThicknessLevel;
+        private BindingSource bindingSource1;
     }
 }
