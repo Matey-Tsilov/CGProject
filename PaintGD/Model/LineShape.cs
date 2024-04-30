@@ -2,8 +2,7 @@
 {
     public class LineShape : IShape
     {   
-        private List<Point> _points;
-        public IReadOnlyCollection<Point> Points { get => _points.AsReadOnly(); }
+        public List<Point> Points { get; set; }
         public bool IsSelected { get; set; } = false;
         public Pen drawnPen { get; set; }
         public Point ShapeCenter { get; set ; }
@@ -12,13 +11,13 @@
 
         public LineShape(int x, int y, int x1, int y1)
         {
-            _points = new List<Point>() { new Point(x, y), new Point(x1, y1)};
-            ShapeCenter = new Point((int)_points.Average(propa => propa.X), (int)_points.Average(propa => propa.Y));
+            Points = new List<Point>() { new Point(x, y), new Point(x1, y1)};
+            ShapeCenter = new Point((int)Points.Average(propa => propa.X), (int)Points.Average(propa => propa.Y));
         }
 
         public void DrawShape(Graphics g, Pen p)
         {
-            g.DrawLine(p, _points[0], _points[1]);
+            g.DrawLine(p, Points[0], Points[1]);
 
             // We memorize the color and width of the drawn shape
             drawnPen = p;
@@ -36,7 +35,7 @@
         }
         public bool IsInBounds(Point click)
         {
-            lineSelectRect = new Rectangle(_points[0].X, _points[0].Y, Math.Abs(_points[1].X - _points[0].X), Math.Abs(_points[0].Y - _points[1].Y));
+            lineSelectRect = new Rectangle(Points[0].X, Points[0].Y, Math.Abs(Points[1].X - Points[0].X), Math.Abs(Points[0].Y - Points[1].Y));
             return lineSelectRect.Contains(click);
         }
     }

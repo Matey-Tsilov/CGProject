@@ -3,7 +3,7 @@
     public interface IShape
     {
         public bool IsSelected { get; set; }
-        public IReadOnlyCollection<Point> Points { get; }
+        public List<Point> Points { get; set; }
         public abstract void DrawShape(Graphics g, Pen p);
         public abstract void SelectShape(Graphics g);
         public Pen drawnPen { get; set; }

@@ -3,18 +3,16 @@
     public class EllipseShape : IShape
     {
         public Rectangle Shape { get; set; }
-
-        private List<Point> _points;
-        public IReadOnlyCollection<Point> Points { get => _points.AsReadOnly(); }
+        public List<Point> Points { get; set; }
         public bool IsSelected { get; set; } = false;
         public Pen drawnPen { get; set; }
         public Point ShapeCenter {get; set;}
 
         public EllipseShape(int x, int y, int width, int height)
         {
-            _points = new List<Point>() { new Point(x, y), new Point(x + width, y + height) };
+            Points = new List<Point>() { new Point(x, y), new Point(x + width, y + height) };
             Shape = new Rectangle(x, y, width, height);
-            ShapeCenter = new Point((int)_points.Average(propa => propa.X), (int)_points.Average(propa => propa.Y));
+            ShapeCenter = new Point((int)Points.Average(propa => propa.X), (int)Points.Average(propa => propa.Y));
         }
 
         public void DrawShape(Graphics g, Pen p)

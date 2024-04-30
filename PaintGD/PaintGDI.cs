@@ -13,6 +13,7 @@ namespace PaintGD
         Point endLocation;
 
         bool isMouseDown = false;
+        bool isDragging = false;
         public PaintGDI()
         {
             InitializeComponent();
@@ -40,6 +41,8 @@ namespace PaintGD
                     // This is the toggle select functionality
                     if (selectedShape != null)
                     {
+                        curShape = selectedShape;
+
                         if (!selectedShape.IsSelected)
                         {
                             // If we have several shapes one onto another we will first select them all before unselecting only top layer!
@@ -47,14 +50,25 @@ namespace PaintGD
                         }
                         else
                         {
-                            // We do it manually from here since we don't have a deselect method made for the public
-                            selectedShape.IsSelected = false;
+                            // This is the area in the center
+                            Rectangle centerPlus = new Rectangle(curShape.ShapeCenter.X, curShape.ShapeCenter.Y, 7, 7);
 
-                            // Because we didn't add the highlight in the array it won't persist so a simple refresh fixes the highlight
-                            panel1.Refresh();
+                            // If he clicked in the center we don't want to deselect the shape but to start dragging it
+                            if (centerPlus.Contains(e.Location))
+                            {
+                                isDragging = true;
+                            }
+                            else
+                            {
+                                // We do it manually from here since we don't have a deselect method made for the public
+                                selectedShape.IsSelected = false;
+
+                                // Because we didn't add the highlight in the array it won't persist so a simple refresh fixes the highlight
+                                panel1.Refresh();
+                            }
+
                         }
 
-                        curShape = selectedShape;
                     }
 
                     // Fix the order of the elements
@@ -71,14 +85,29 @@ namespace PaintGD
                 endLocation = e.Location;
 
                 // We handle this specific case, to allow resizing and dragging
-                if (allShapes.Count > 0 && SelectShape.Checked && e.Button == MouseButtons.Right)
+                if (SelectShape.Checked && isDragging)
                 {
-                    //// If 
-                    //if (curShape.Shape)
-                    //{
-                        
-                    //}
+                    string curShapeClass = curShape.GetType().Name;
+                    Point newCenter = new Point(e.X, e.Y);
+                    int widthOfShape = (curShape.ShapeCenter.X - curShape.Points[0].X) * 2;
+                    int heightOfShape = (curShape.ShapeCenter.Y - curShape.Points[0].Y) * 2;
 
+                    // That way we get rid of the after images for dragging
+                    allShapes.Remove(curShape);
+
+                    switch (curShapeClass)
+                    {
+                        case "SquareShape": curShape = new SquareShape(newCenter, widthOfShape, heightOfShape); break;
+                        case "LineShape": 
+                            break;
+                        //case "ElipseShape": curShape = new ElipseShape(newCenter, widthOfShape, heightOfShape);  break;
+                        case "TrapezoidShape": 
+                            break;
+                        case "TriangleShape": 
+                            break;
+                    }
+
+                    panel1.Refresh();
                 }
                 else
                 {
@@ -162,9 +191,10 @@ namespace PaintGD
                 endLocation = e.Location;
 
                 // We handle this specific case, to allow resizing and dragging
-                if (SelectShape.Checked)
+                if (SelectShape.Checked && isDragging)
                 {
 
+                    
                 }
                 else
                 {
@@ -234,15 +264,17 @@ namespace PaintGD
                             rucX, rucY
                         );
                     }
-
-                    // Add the current shape to the Array to persist
-                    allShapes.Add(curShape);
-
-                    panel1.Refresh();
                 }
 
+                // Tyka ima problem s refreshvaneto i zadawaneto na select shape!
+                allShapes.Add(curShape);
+                panel1.Refresh();
+
+                // We go back to default values for everything
                 isMouseDown = false;
+                isDragging = false;
                 curShape = null;
+
             }
         }
 
@@ -267,7 +299,8 @@ namespace PaintGD
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
-            // We leave this block to have rendering of the shape currently being drawn, after Mouse_Move event
+            // This block will be executed only when dragging the shape to make it,
+            // after that the shape becomes again null and the letter if will take care of rendering
             if (curShape != null)
             {
                 curShape.DrawShape(e.Graphics, new Pen(colorDialog1.Color, trackBar1.Value));
