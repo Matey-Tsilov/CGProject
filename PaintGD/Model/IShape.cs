@@ -8,5 +8,6 @@
         public abstract void SelectShape(Graphics g);
         public Pen drawnPen { get; set; }
         public abstract bool IsInBounds(Point click);
+        public Point ShapeCenter { get; set; }
     }
 }

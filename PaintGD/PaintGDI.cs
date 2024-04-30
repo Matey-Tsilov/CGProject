@@ -54,6 +54,7 @@ namespace PaintGD
                             panel1.Refresh();
                         }
 
+                        curShape = selectedShape;
                     }
 
                     // Fix the order of the elements
@@ -70,8 +71,13 @@ namespace PaintGD
                 endLocation = e.Location;
 
                 // We handle this specific case, to allow resizing and dragging
-                if (SelectShape.Checked)
+                if (allShapes.Count > 0 && SelectShape.Checked && e.Button == MouseButtons.Right)
                 {
+                    //// If 
+                    //if (curShape.Shape)
+                    //{
+                        
+                    //}
 
                 }
                 else
@@ -109,7 +115,7 @@ namespace PaintGD
                         int topX = startLocation.X + sideOfPerfectTriangle / 2;
                         var topY = startLocation.Y - (int)height;
 
-                        curShape = new TriangleShape(startLocation.X, startLocation.Y, endLocation.X, startLocation.Y, topX, topY);
+                        curShape = new TriangleShape(startLocation.X, startLocation.Y, endLocation.X, startLocation.Y, topX, topY, (int)height);
                     }
                     else if (DrawTrapezoid.Checked)
                     {
@@ -195,7 +201,7 @@ namespace PaintGD
                         int topX = startLocation.X + sideOfPerfectTriangle / 2;
                         var topY = startLocation.Y - (int)height;
 
-                        curShape = new TriangleShape(startLocation.X, startLocation.Y, endLocation.X, startLocation.Y, topX, topY);
+                        curShape = new TriangleShape(startLocation.X, startLocation.Y, endLocation.X, startLocation.Y, topX, topY, (int)height);
                     }
                     else if (DrawTrapezoid.Checked)
                     {
@@ -236,7 +242,7 @@ namespace PaintGD
                 }
 
                 isMouseDown = false;
-
+                curShape = null;
             }
         }
 
@@ -278,8 +284,9 @@ namespace PaintGD
                     // We have a special treatment for the selected shapes between renders, for them to persist
                     if (cur.IsSelected)
                     {
-                        // TODO: Fix the trapezoid highlight to persist, not only shape color of highlight
-                        cur.DrawShape(e.Graphics, new Pen(Color.Blue, 3));
+                        cur.DrawShape(e.Graphics, cur.drawnPen);
+                        cur.SelectShape(g);
+                        cur.IsSelected = true; // Neutralize the in-method IsSelected assignment
                     }
                     else
                     {
