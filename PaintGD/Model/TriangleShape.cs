@@ -2,35 +2,29 @@
 
 namespace PaintGD.Model
 {
-    public class TriangleShape : IShape
+    public class TriangleShape : Shape
     {
-        public List<Point> Points { get; set; }
-        public bool IsSelected { get; set; } = false;
-        public Pen drawnPen { get; set; }
-        public Point ShapeCenter { get; set; }
-
         public TriangleShape(int x, int y, int x1, int y1, int x2, int y2, int height)
         {
-            Points = new List<Point>() { new Point(x, y), new Point(x1, y1), new Point(x2, y2)};
+            Points = new List<Point>() { new Point(x, y), new Point(x1, y1), new Point(x2, y2) };
             ShapeCenter = new Point((x + y) / 2, height / 2);
         }
 
-        public void DrawShape(Graphics g, Pen p)
+        public override void DrawShape(Graphics g, Pen p)
         {
             PointF[] pointsF = Points.Select(p => new PointF(p.X, p.Y)).ToArray();
             g.DrawPolygon(p, pointsF);
 
             // We memorize the color and width of the drawn shape
-            drawnPen = p;
+            DrawnPen = p;
         }
-        public void SelectShape(Graphics g)
+        public override void SelectShape(Graphics g)
         {
-            // Toggle button for selecting an element
-            this.IsSelected = !this.IsSelected;
+            this.IsSelected = true;
 
             var selectRect = new Rectangle(
-                Points[0].X, Points[2].Y, 
-                Math.Abs(Points[1].X - Points[0].X), 
+                Points[0].X, Points[2].Y,
+                Math.Abs(Points[1].X - Points[0].X),
                 Math.Abs(Points[2].Y - Points[1].Y));
             g.DrawRectangle(new Pen(Color.Blue, 5), selectRect);
 
@@ -39,7 +33,7 @@ namespace PaintGD.Model
             g.DrawLine(new Pen(Color.Red, 1), new Point(ShapeCenter.X - 5, ShapeCenter.Y), new Point(ShapeCenter.X + 5, ShapeCenter.Y));
         }
 
-        public bool IsInBounds(Point click)
+        public override bool IsInBounds(Point click)
         {
             // Create a GraphicsPath object
             using (GraphicsPath path = new GraphicsPath())

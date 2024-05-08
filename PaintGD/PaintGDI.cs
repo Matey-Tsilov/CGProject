@@ -4,8 +4,8 @@ namespace PaintGD
 {
     public partial class PaintGDI : Form
     {
-        List<IShape> allShapes;
-        IShape curShape;
+        List<Shape> allShapes;
+        Shape curShape;
         Graphics g;
         Pen p;
 
@@ -19,7 +19,7 @@ namespace PaintGD
             InitializeComponent();
             g = panel1.CreateGraphics();
             p = new Pen(colorDialog1.Color, trackBar1.Value);
-            allShapes = new List<IShape>();
+            allShapes = new List<Shape>();
         }
 
         private void Mouse_Down(object sender, MouseEventArgs e)
@@ -47,11 +47,12 @@ namespace PaintGD
                         {
                             // If we have several shapes one onto another we will first select them all before unselecting only top layer!
                             selectedShape.SelectShape(g);
+                            isMouseDown = false;
                         }
                         else
                         {
-                            // This is the area in the center
-                            Rectangle centerPlus = new Rectangle(curShape.ShapeCenter.X, curShape.ShapeCenter.Y, 7, 7);
+                            // Is it the area in the center
+                            Rectangle centerPlus = new Rectangle(curShape.ShapeCenter.X, curShape.ShapeCenter.Y, 15, 15);
 
                             // If he clicked in the center we don't want to deselect the shape but to start dragging it
                             if (centerPlus.Contains(e.Location))
@@ -60,15 +61,21 @@ namespace PaintGD
                             }
                             else
                             {
-                                // We do it manually from here since we don't have a deselect method made for the public
+                                // We do it manually from here
                                 selectedShape.IsSelected = false;
-
                                 // Because we didn't add the highlight in the array it won't persist so a simple refresh fixes the highlight
                                 panel1.Refresh();
                             }
 
                         }
 
+                    }
+                    else
+                    {
+                        // If we just clicked outside of the bound of the element, we don't do or refresh anything
+                        // We need to stop it before the Mouse_Move event since it will be triggered before the regular
+                        // changing of the isMOuseDown property in Mouse_Up event
+                        isMouseDown = false;
                     }
 
                     // Fix the order of the elements
@@ -98,12 +105,12 @@ namespace PaintGD
                     switch (curShapeClass)
                     {
                         case "SquareShape": curShape = new SquareShape(newCenter, widthOfShape, heightOfShape); break;
-                        case "LineShape": 
+                        case "LineShape":
                             break;
                         //case "ElipseShape": curShape = new ElipseShape(newCenter, widthOfShape, heightOfShape);  break;
-                        case "TrapezoidShape": 
+                        case "TrapezoidShape":
                             break;
-                        case "TriangleShape": 
+                        case "TriangleShape":
                             break;
                     }
 
@@ -194,7 +201,7 @@ namespace PaintGD
                 if (SelectShape.Checked && isDragging)
                 {
 
-                    
+
                 }
                 else
                 {
@@ -266,8 +273,11 @@ namespace PaintGD
                     }
                 }
 
-                // Tyka ima problem s refreshvaneto i zadawaneto na select shape!
-                allShapes.Add(curShape);
+                // That way we avoid adding null shapes or the selected ones to the collection while selecting something
+                if (curShape != null && !curShape.IsSelected)
+                {
+                    allShapes.Add(curShape);
+                }
                 panel1.Refresh();
 
                 // We go back to default values for everything
@@ -299,32 +309,24 @@ namespace PaintGD
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
-            // This block will be executed only when dragging the shape to make it,
-            // after that the shape becomes again null and the letter if will take care of rendering
+            // This lines are for the dynamic drawing, not connected with persisting the drawings
             if (curShape != null)
             {
                 curShape.DrawShape(e.Graphics, new Pen(colorDialog1.Color, trackBar1.Value));
             }
 
-            // We want to redraw the other drawings after adding the current one
+            // We want to redraw all other drawings, the currently drawn one, won't be included as it is still not finished = added to the list with drawings
             if (allShapes.Count != 0)
             {
-                // We exclude the already redrawn shape, and redraw the others
-                var shapesLeftToBeRedrawn = allShapes.Where(shape => shape != curShape).ToList();
-
-                shapesLeftToBeRedrawn.ForEach(cur =>
+                allShapes.ForEach(cur =>
                 {
+                    // We can access the drawnPen property as this won't be the first time they are redrawn = they have it set!
+                    cur.DrawShape(e.Graphics, cur.DrawnPen);
+
                     // We have a special treatment for the selected shapes between renders, for them to persist
                     if (cur.IsSelected)
                     {
-                        cur.DrawShape(e.Graphics, cur.drawnPen);
                         cur.SelectShape(g);
-                        cur.IsSelected = true; // Neutralize the in-method IsSelected assignment
-                    }
-                    else
-                    {
-                        // We can access the drawnPen property as this won't be the first time they are redrawn = they have it set!
-                        cur.DrawShape(e.Graphics, cur.drawnPen);
                     }
                 });
             }

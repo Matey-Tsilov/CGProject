@@ -1,12 +1,8 @@
 ﻿namespace PaintGD.Model
 {
-    public class EllipseShape : IShape
+    public class EllipseShape : Shape
     {
         public Rectangle Shape { get; set; }
-        public List<Point> Points { get; set; }
-        public bool IsSelected { get; set; } = false;
-        public Pen drawnPen { get; set; }
-        public Point ShapeCenter {get; set;}
 
         public EllipseShape(int x, int y, int width, int height)
         {
@@ -15,17 +11,16 @@
             ShapeCenter = new Point((int)Points.Average(propa => propa.X), (int)Points.Average(propa => propa.Y));
         }
 
-        public void DrawShape(Graphics g, Pen p)
+        public override void DrawShape(Graphics g, Pen p)
         {
             g.DrawEllipse(p, Shape);
 
             // We memorize the color and width of the drawn shape
-            drawnPen = p;
+            DrawnPen = p;
         }
-        public void SelectShape(Graphics g)
+        public override void SelectShape(Graphics g)
         {
-            // Toggle button for selecting an element
-            this.IsSelected = !this.IsSelected;
+            this.IsSelected = true;
 
             g.DrawRectangle(new Pen(Color.Blue, 5), Shape);
 
@@ -34,16 +29,10 @@
             g.DrawLine(new Pen(Color.Red, 1), new Point(ShapeCenter.X - 5, ShapeCenter.Y), new Point(ShapeCenter.X + 5, ShapeCenter.Y));
 
         }
-        public bool IsInBounds(Point click)
+        public override bool IsInBounds(Point click)
         {
             // return if the click is inside the rectangle or not!
             return Shape.Contains(click);
-        }
-
-        // newCenter will be the newPoint to which our shape is dragged to
-        public void DragShapeTo(Point newCenter)
-        {
-
         }
     }
 }
