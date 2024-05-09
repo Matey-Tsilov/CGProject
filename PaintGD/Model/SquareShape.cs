@@ -3,17 +3,17 @@
     public class SquareShape : Shape
     {
         public Rectangle Shape { get; set; }
-
         public SquareShape(int x, int y, int width, int height)
         {
             Points = new List<Point>() { new Point(x, y), new Point(x + width, y + height) };
             Shape = new Rectangle(x, y, width, height);
             ShapeCenter = new Point((int)Points.Average(propa => propa.X), (int)Points.Average(propa => propa.Y));
         }
-        public SquareShape(Point center, int width, int height)
+        public SquareShape(Point center, int halfWidth, int halfHeight)
         {
-            Points = new List<Point>() { new Point(center.X - width, center.Y - height), new Point(center.X + width, center.Y + height) };
-            Shape = new Rectangle(center.X - width, center.Y - height, width, height);
+            // We need those Points in all shapes to calculate the width, while dragging
+            Points = new List<Point>() { new Point(center.X - halfWidth, center.Y - halfHeight), new Point(center.X + halfWidth, center.Y + halfHeight) };
+            Shape = new Rectangle(center.X - halfWidth, center.Y - halfHeight, halfWidth * 2, halfHeight * 2);
             ShapeCenter = center;
         }
 

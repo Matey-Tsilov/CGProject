@@ -52,7 +52,7 @@ namespace PaintGD
                         else
                         {
                             // Is it the area in the center
-                            Rectangle centerPlus = new Rectangle(curShape.ShapeCenter.X, curShape.ShapeCenter.Y, 15, 15);
+                            Rectangle centerPlus = new Rectangle(curShape.ShapeCenter.X - 15, curShape.ShapeCenter.Y - 15, 30, 30);
 
                             // If he clicked in the center we don't want to deselect the shape but to start dragging it
                             if (centerPlus.Contains(e.Location))
@@ -63,18 +63,14 @@ namespace PaintGD
                             {
                                 // We do it manually from here
                                 selectedShape.IsSelected = false;
-                                // Because we didn't add the highlight in the array it won't persist so a simple refresh fixes the highlight
-                                panel1.Refresh();
                             }
-
                         }
-
                     }
                     else
                     {
                         // If we just clicked outside of the bound of the element, we don't do or refresh anything
                         // We need to stop it before the Mouse_Move event since it will be triggered before the regular
-                        // changing of the isMOuseDown property in Mouse_Up event
+                        // changing of the isMouseDown property in Mouse_Up event
                         isMouseDown = false;
                     }
 
@@ -91,33 +87,35 @@ namespace PaintGD
             {
                 endLocation = e.Location;
 
-                // We handle this specific case, to allow resizing and dragging
+                // We handle this specific case, to allow dragging
                 if (SelectShape.Checked && isDragging)
                 {
+                    // We remove it, because we substitude it by the newly dragged one
+                    allShapes.Remove(curShape);
+
                     string curShapeClass = curShape.GetType().Name;
                     Point newCenter = new Point(e.X, e.Y);
-                    int widthOfShape = (curShape.ShapeCenter.X - curShape.Points[0].X) * 2;
-                    int heightOfShape = (curShape.ShapeCenter.Y - curShape.Points[0].Y) * 2;
 
-                    // That way we get rid of the after images for dragging
-                    allShapes.Remove(curShape);
+                    // Those values are unchangable throughout the whole dragging, since curShape won't be changed until 
+                    int shapeHalfWidth = Math.Abs(curShape.Points[0].X - curShape.Points[1].X) / 2;
+                    int shapeHalfHeight = Math.Abs(curShape.Points[0].Y - curShape.Points[1].Y) / 2;
 
                     switch (curShapeClass)
                     {
-                        case "SquareShape": curShape = new SquareShape(newCenter, widthOfShape, heightOfShape); break;
-                        case "LineShape":
+                        case "SquareShape":
+                            curShape = new SquareShape(newCenter, shapeHalfWidth, shapeHalfHeight);
                             break;
-                        //case "ElipseShape": curShape = new ElipseShape(newCenter, widthOfShape, heightOfShape);  break;
-                        case "TrapezoidShape":
+                        case "EllipseShape":
+                            curShape = new EllipseShape(newCenter, shapeHalfWidth, shapeHalfHeight);
                             break;
-                        case "TriangleShape":
-                            break;
+                        case "LineShape": break;
+                        case "TrapezoidShape": break;
+                        case "TriangleShape": break;
                     }
-
-                    panel1.Refresh();
                 }
                 else
                 {
+                    // Based on selected option, we create a different shape
                     if (DrawCircle.Checked)
                     {
                         int width = endLocation.X - startLocation.X;
@@ -184,9 +182,10 @@ namespace PaintGD
                             rucX, rucY
                         );
                     }
-
-                    panel1.Refresh();
                 }
+
+                // Apply changes to canva
+                panel1.Refresh();
             }
         }
 
@@ -205,6 +204,7 @@ namespace PaintGD
                 }
                 else
                 {
+                    // Based on selected option, we create a different shape
                     if (DrawCircle.Checked)
                     {
                         int width = endLocation.X - startLocation.X;
@@ -273,18 +273,17 @@ namespace PaintGD
                     }
                 }
 
-                // That way we avoid adding null shapes or the selected ones to the collection while selecting something
-                if (curShape != null && !curShape.IsSelected)
+                // That way we avoid adding null shapes or the selected ones to the collection while selecting or dragging, or adding the same one again
+                if (curShape != null && !curShape.IsSelected && !allShapes.Contains(curShape))
                 {
                     allShapes.Add(curShape);
                 }
+
                 panel1.Refresh();
 
                 // We go back to default values for everything
                 isMouseDown = false;
                 isDragging = false;
-                curShape = null;
-
             }
         }
 
@@ -309,7 +308,8 @@ namespace PaintGD
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
-            // This lines are for the dynamic drawing, not connected with persisting the drawings
+            // This lines are for the dynamic drawing, before adding to the collection,
+            // not connected with persisting the drawings
             if (curShape != null)
             {
                 curShape.DrawShape(e.Graphics, new Pen(colorDialog1.Color, trackBar1.Value));
@@ -318,17 +318,15 @@ namespace PaintGD
             // We want to redraw all other drawings, the currently drawn one, won't be included as it is still not finished = added to the list with drawings
             if (allShapes.Count != 0)
             {
-                allShapes.ForEach(cur =>
-                {
-                    // We can access the drawnPen property as this won't be the first time they are redrawn = they have it set!
-                    cur.DrawShape(e.Graphics, cur.DrawnPen);
-
-                    // We have a special treatment for the selected shapes between renders, for them to persist
-                    if (cur.IsSelected)
+                allShapes.Where(s => s != curShape).ToList()
+                    .ForEach(cur =>
                     {
-                        cur.SelectShape(g);
-                    }
-                });
+                        // We can access the drawnPen property as this won't be the first time they are redrawn = they have it set!
+                        cur.DrawShape(e.Graphics, cur.DrawnPen);
+
+                        // We have a special treatment for the selected shapes between renders, for them to persist
+                        if (cur.IsSelected) cur.SelectShape(g);
+                    });
             }
         }
 
