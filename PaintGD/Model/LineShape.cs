@@ -9,6 +9,15 @@
             Points = new List<Point>() { new Point(x, y), new Point(x1, y1) };
             ShapeCenter = new Point((int)Points.Average(propa => propa.X), (int)Points.Average(propa => propa.Y));
         }
+        public LineShape(Point center, int halfWidth, int halfHeight)
+        {
+            // We need those Points in all shapes to calculate the width, while dragging
+            Points = new List<Point>() {
+                new Point(center.X - halfWidth, center.Y - halfHeight),
+                new Point(center.X + halfWidth, center.Y + halfHeight)
+            };
+            ShapeCenter = center;
+        }
 
         public override void DrawShape(Graphics g, Pen p)
         {

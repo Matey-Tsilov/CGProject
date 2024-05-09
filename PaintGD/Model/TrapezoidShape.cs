@@ -7,9 +7,19 @@ namespace PaintGD.Model
         public TrapezoidShape(int x, int y, int x1, int y1, int x2, int y2, int x3, int y3)
         {
             Points = new List<Point>() { new Point(x, y), new Point(x1, y1), new Point(x2, y2), new Point(x3, y3) };
-            ShapeCenter = new Point((x + x1) / 2, (y - y1) / 2);
+            ShapeCenter = new Point((x + x1) / 2, (y + y2) / 2);
         }
-
+        public TrapezoidShape(Point center, int halfWidth, int halfHeight, int indent)
+        {
+            // We need those Points in all shapes to calculate the width, while dragging
+            Points = new List<Point>() {
+                new Point(center.X - halfWidth, center.Y + halfHeight),
+                new Point(center.X + halfWidth, center.Y + halfHeight),
+                new Point(center.X + halfWidth - indent, center.Y - halfHeight),
+                new Point(center.X - halfWidth + indent, center.Y - halfHeight)
+            };
+            ShapeCenter = center;
+        }
         public override void DrawShape(Graphics g, Pen p)
         {
             PointF[] pointsF = Points.Select(p => new PointF(p.X, p.Y)).ToArray();

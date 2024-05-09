@@ -12,7 +12,10 @@
         public SquareShape(Point center, int halfWidth, int halfHeight)
         {
             // We need those Points in all shapes to calculate the width, while dragging
-            Points = new List<Point>() { new Point(center.X - halfWidth, center.Y - halfHeight), new Point(center.X + halfWidth, center.Y + halfHeight) };
+            Points = new List<Point>() {
+                new Point(center.X - halfWidth, center.Y - halfHeight),
+                new Point(center.X + halfWidth, center.Y + halfHeight)
+            };
             Shape = new Rectangle(center.X - halfWidth, center.Y - halfHeight, halfWidth * 2, halfHeight * 2);
             ShapeCenter = center;
         }

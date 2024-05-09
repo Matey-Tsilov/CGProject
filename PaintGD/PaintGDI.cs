@@ -94,6 +94,8 @@ namespace PaintGD
                     allShapes.Remove(curShape);
 
                     string curShapeClass = curShape.GetType().Name;
+
+                    // We create new shapes based on the center location
                     Point newCenter = new Point(e.X, e.Y);
 
                     // Those values are unchangable throughout the whole dragging, since curShape won't be changed until 
@@ -108,9 +110,18 @@ namespace PaintGD
                         case "EllipseShape":
                             curShape = new EllipseShape(newCenter, shapeHalfWidth, shapeHalfHeight);
                             break;
-                        case "LineShape": break;
-                        case "TrapezoidShape": break;
-                        case "TriangleShape": break;
+                        case "LineShape":
+                            curShape = new LineShape(newCenter, shapeHalfWidth, shapeHalfHeight);
+                            break;
+                        case "TriangleShape":
+                            shapeHalfHeight = Math.Abs(curShape.Points[0].Y - curShape.Points[2].Y) / 2;
+                            curShape = new TriangleShape(newCenter, shapeHalfWidth, shapeHalfHeight);
+                            break;
+                        case "TrapezoidShape":
+                            shapeHalfHeight = Math.Abs(curShape.Points[0].Y - curShape.Points[2].Y) / 2;
+                            int indent = curShape.Points[3].X - curShape.Points[0].X;
+                            curShape = new TrapezoidShape(newCenter, shapeHalfWidth, shapeHalfHeight, indent);
+                            break;
                     }
                 }
                 else
@@ -140,47 +151,11 @@ namespace PaintGD
                     }
                     else if (DrawTriangle.Checked)
                     {
-                        var sideOfPerfectTriangle = endLocation.X - startLocation.X;
-
-                        // The height will always be upwards
-                        double height = Math.Abs(sideOfPerfectTriangle * Math.Sqrt(3) / 2);
-
-                        // If we start drawing the triangle backwards we need to handle the position of the topX
-                        int topX = startLocation.X + sideOfPerfectTriangle / 2;
-                        var topY = startLocation.Y - (int)height;
-
-                        curShape = new TriangleShape(startLocation.X, startLocation.Y, endLocation.X, startLocation.Y, topX, topY, (int)height);
+                        curShape = createTriangle();
                     }
                     else if (DrawTrapezoid.Checked)
                     {
-                        // This is hard-coded, we need to adjust it based on the trapezoid
-                        int upperIndednt = Math.Abs(endLocation.X - startLocation.X) / 4;
-
-                        // Because we want backwards compatibility we need to have both the 
-                        // Start and End locations and decide which should be the left and right one
-
-                        // Left Down Corner
-                        int ldcX = Math.Min(startLocation.X, endLocation.X);
-                        int ldcY = startLocation.Y;
-
-                        // Right Down Corner
-                        int rdcX = Math.Max(startLocation.X, endLocation.X);
-                        int rdcY = startLocation.Y;
-
-                        // Left Upper Corner    
-                        int lucX = rdcX - upperIndednt;
-                        int lucY = startLocation.Y - upperIndednt * 2;
-
-                        // Right Upper Corner
-                        int rucX = ldcX + upperIndednt;
-                        int rucY = startLocation.Y - upperIndednt * 2;
-
-                        curShape = new TrapezoidShape(
-                            ldcX, ldcY,
-                            rdcX, rdcY,
-                            lucX, lucY,
-                            rucX, rucY
-                        );
+                        curShape = createTrapezoid();
                     }
                 }
 
@@ -229,47 +204,11 @@ namespace PaintGD
                     }
                     else if (DrawTriangle.Checked)
                     {
-                        var sideOfPerfectTriangle = endLocation.X - startLocation.X;
-
-                        // The height will always be upwards
-                        double height = Math.Abs(sideOfPerfectTriangle * Math.Sqrt(3) / 2);
-
-                        // If we start drawing the triangle backwards we need to handle the position of the topX
-                        int topX = startLocation.X + sideOfPerfectTriangle / 2;
-                        var topY = startLocation.Y - (int)height;
-
-                        curShape = new TriangleShape(startLocation.X, startLocation.Y, endLocation.X, startLocation.Y, topX, topY, (int)height);
+                        curShape = createTriangle();
                     }
                     else if (DrawTrapezoid.Checked)
                     {
-                        // This is hard-coded, we need to adjust it based on the trapezoid
-                        int upperIndednt = Math.Abs(endLocation.X - startLocation.X) / 4;
-
-                        // Because we want backwards compatibility we need to have both the 
-                        // Start and End locations and decide which should be the left and right one
-
-                        // Left Down Corner
-                        int ldcX = Math.Min(startLocation.X, endLocation.X);
-                        int ldcY = startLocation.Y;
-
-                        // Right Down Corner
-                        int rdcX = Math.Max(startLocation.X, endLocation.X);
-                        int rdcY = startLocation.Y;
-
-                        // Left Upper Corner    
-                        int lucX = rdcX - upperIndednt;
-                        int lucY = startLocation.Y - upperIndednt * 2;
-
-                        // Right Upper Corner
-                        int rucX = ldcX + upperIndednt;
-                        int rucY = startLocation.Y - upperIndednt * 2;
-
-                        curShape = new TrapezoidShape(
-                            ldcX, ldcY,
-                            rdcX, rdcY,
-                            lucX, lucY,
-                            rucX, rucY
-                        );
+                        curShape = createTrapezoid();
                     }
                 }
 
@@ -333,6 +272,57 @@ namespace PaintGD
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
             p.Width = trackBar1.Value;
+        }
+
+        // Since the logic is hard we make some factory functions
+        private TrapezoidShape createTrapezoid()
+        {
+            // This is hard-coded, we need to adjust it based on the trapezoid
+            int upperIndent = Math.Abs(endLocation.X - startLocation.X) / 4;
+
+            // Because we want backwards compatibility we need to have both the 
+            // Start and End locations and decide which should be the left and right one
+
+            // Left Down Corner
+            int ldcX = Math.Min(startLocation.X, endLocation.X);
+            int ldcY = startLocation.Y;
+
+            // Right Down Corner
+            int rdcX = Math.Max(startLocation.X, endLocation.X);
+            int rdcY = startLocation.Y;
+
+            // Left Upper Corner    
+            int lucX = rdcX - upperIndent;
+            int lucY = startLocation.Y - upperIndent * 2;
+
+            // Right Upper Corner
+            int rucX = ldcX + upperIndent;
+            int rucY = startLocation.Y - upperIndent * 2;
+
+            return new TrapezoidShape(
+                ldcX, ldcY,
+                rdcX, rdcY,
+                lucX, lucY,
+                rucX, rucY
+            );
+        }
+        private TriangleShape createTriangle()
+        {
+            var sideOfPerfectTriangle = endLocation.X - startLocation.X;
+
+            // The height will always be upwards
+            double height = Math.Abs(sideOfPerfectTriangle * Math.Sqrt(3) / 2);
+
+            // If we start drawing the triangle backwards we need to handle the position of the topX
+            int topX = startLocation.X + sideOfPerfectTriangle / 2;
+            var topY = startLocation.Y - (int)height;
+
+            return new TriangleShape(startLocation.X, startLocation.Y, endLocation.X, startLocation.Y, topX, topY);
+        }
+
+        private Shape createCustomShape()
+        {
+            return null;
         }
     }
 }

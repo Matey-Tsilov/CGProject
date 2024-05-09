@@ -4,10 +4,21 @@ namespace PaintGD.Model
 {
     public class TriangleShape : Shape
     {
-        public TriangleShape(int x, int y, int x1, int y1, int x2, int y2, int height)
+        public TriangleShape(int x, int y, int x1, int y1, int x2, int y2)
         {
             Points = new List<Point>() { new Point(x, y), new Point(x1, y1), new Point(x2, y2) };
-            ShapeCenter = new Point((x + y) / 2, height / 2);
+            ShapeCenter = new Point((x + x1) / 2, (y + y2) / 2);
+        }
+
+        public TriangleShape(Point center, int halfWidth, int halfHeight)
+        {
+            // We need those Points in all shapes to calculate the width, while dragging
+            Points = new List<Point>() {
+                new Point(center.X - halfWidth, center.Y + halfHeight),
+                new Point(center.X + halfWidth, center.Y + halfHeight),
+                new Point(center.X, center.Y - halfHeight),
+            };
+            ShapeCenter = center;
         }
 
         public override void DrawShape(Graphics g, Pen p)
