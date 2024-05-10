@@ -37,7 +37,8 @@ namespace PaintGD.Model
                 Points[0].X, Points[2].Y,
                 Math.Abs(Points[1].X - Points[0].X),
                 Math.Abs(Points[2].Y - Points[1].Y));
-            g.DrawRectangle(new Pen(Color.Blue, 5), selectRect);
+
+            g.DrawRectangle(new Pen(Color.Blue, 2), selectRect);
 
             // Draw shape center plus sign
             g.DrawLine(new Pen(Color.Red, 1), new Point(ShapeCenter.X, ShapeCenter.Y - 5), new Point(ShapeCenter.X, ShapeCenter.Y + 5));

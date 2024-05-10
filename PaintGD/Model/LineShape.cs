@@ -2,8 +2,6 @@
 {
     public class LineShape : Shape
     {
-        private Rectangle lineSelectRect; // Specific property for the Line to generate the select rectangle
-
         public LineShape(int x, int y, int x1, int y1)
         {
             Points = new List<Point>() { new Point(x, y), new Point(x1, y1) };
@@ -30,6 +28,15 @@
         {
             this.IsSelected = true;
 
+            // We need to put the upper most Point as the begin for the select rectangle
+            // * We have this logic here since the only problem with the LineShape will be during the select
+            //   rectangle drawing, since we don't know if it was drawn backwards or not
+            int upperY = Math.Min(Points[0].Y, Points[1].Y);
+            int upperX = Math.Min(Points[0].X, Points[1].X);
+
+            // We put that here for it to be calculated on each resize, which triggers a redraw and modification in the Points collection values
+            var lineSelectRect = new Rectangle(upperX, upperY, Math.Abs(Points[1].X - Points[0].X), Math.Abs(Points[0].Y - Points[1].Y));
+
             g.DrawRectangle(new Pen(Color.Blue, 2), lineSelectRect);
 
             // Draw shape center plus sign
@@ -38,8 +45,15 @@
         }
         public override bool IsInBounds(Point click)
         {
-            lineSelectRect = new Rectangle(Points[0].X, Points[0].Y, Math.Abs(Points[1].X - Points[0].X), Math.Abs(Points[0].Y - Points[1].Y));
-            return lineSelectRect.Contains(click);
+            // We need to put the upper most Point as the begin for the select rectangle
+            // * We have this logic here since the only problem with the LineShape will be during the select
+            //   rectangle drawing, since we don't know if it was drawn backwards or not
+            int upperY = Math.Min(Points[0].Y, Points[1].Y);
+            int upperX = Math.Min(Points[0].X, Points[1].X);
+
+            // Here we dont only select when we click directly on the line but on each place in the select rectangle of it
+            var LineSelectZone = new Rectangle(upperX, upperY, Math.Abs(Points[1].X - Points[0].X), Math.Abs(Points[0].Y - Points[1].Y));
+            return LineSelectZone.Contains(click);
         }
     }
 }

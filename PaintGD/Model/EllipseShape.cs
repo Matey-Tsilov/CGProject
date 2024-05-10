@@ -32,7 +32,7 @@
         {
             this.IsSelected = true;
 
-            g.DrawRectangle(new Pen(Color.Blue, 5), Shape);
+            g.DrawRectangle(new Pen(Color.Blue, 2), Shape);
 
             // Draw shape center plus sign
             g.DrawLine(new Pen(Color.Red, 1), new Point(ShapeCenter.X, ShapeCenter.Y - 5), new Point(ShapeCenter.X, ShapeCenter.Y + 5));

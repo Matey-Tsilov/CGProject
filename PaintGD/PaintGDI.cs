@@ -12,6 +12,8 @@ namespace PaintGD
         Point startLocation;
         Point endLocation;
 
+        int previousSizeScrollValue = 0;
+
         bool isMouseDown = false;
         bool isDragging = false;
         public PaintGDI()
@@ -129,25 +131,15 @@ namespace PaintGD
                     // Based on selected option, we create a different shape
                     if (DrawCircle.Checked)
                     {
-                        int width = endLocation.X - startLocation.X;
-                        int height = endLocation.Y - startLocation.Y;
-
-                        curShape = new EllipseShape(startLocation.X, startLocation.Y, width, height);
+                        curShape = createEllipse();
                     }
                     else if (DrawLine.Checked)
                     {
-                        curShape = new LineShape(startLocation.X, startLocation.Y, endLocation.X, endLocation.Y);
+                        curShape = createLine();
                     }
                     else if (DrawSquare.Checked)
                     {
-                        int width = Math.Abs(endLocation.X - startLocation.X);
-                        int height = Math.Abs(endLocation.Y - startLocation.Y);
-
-                        // Ensure that the width and height are positive
-                        int x = Math.Min(startLocation.X, endLocation.X);
-                        int y = Math.Min(startLocation.Y, endLocation.Y);
-
-                        curShape = new SquareShape(x, y, width, height);
+                        curShape = createSquare();
                     }
                     else if (DrawTriangle.Checked)
                     {
@@ -171,45 +163,26 @@ namespace PaintGD
             {
                 endLocation = e.Location;
 
-                // We handle this specific case, to allow resizing and dragging
-                if (SelectShape.Checked && isDragging)
+                // Based on selected option, we create a different shape
+                if (DrawCircle.Checked)
                 {
-
-
+                    curShape = createEllipse();
                 }
-                else
+                else if (DrawLine.Checked)
                 {
-                    // Based on selected option, we create a different shape
-                    if (DrawCircle.Checked)
-                    {
-                        int width = endLocation.X - startLocation.X;
-                        int height = endLocation.Y - startLocation.Y;
-
-                        curShape = new EllipseShape(startLocation.X, startLocation.Y, width, height);
-                    }
-                    else if (DrawLine.Checked)
-                    {
-                        curShape = new LineShape(startLocation.X, startLocation.Y, endLocation.X, endLocation.Y);
-                    }
-                    else if (DrawSquare.Checked)
-                    {
-                        int width = Math.Abs(endLocation.X - startLocation.X);
-                        int height = Math.Abs(endLocation.Y - startLocation.Y);
-
-                        // Ensure that the width and height are positive
-                        int x = Math.Min(startLocation.X, endLocation.X);
-                        int y = Math.Min(startLocation.Y, endLocation.Y);
-
-                        curShape = new SquareShape(x, y, width, height);
-                    }
-                    else if (DrawTriangle.Checked)
-                    {
-                        curShape = createTriangle();
-                    }
-                    else if (DrawTrapezoid.Checked)
-                    {
-                        curShape = createTrapezoid();
-                    }
+                    curShape = createLine();
+                }
+                else if (DrawSquare.Checked)
+                {
+                    curShape = createSquare();
+                }
+                else if (DrawTriangle.Checked)
+                {
+                    curShape = createTriangle();
+                }
+                else if (DrawTrapezoid.Checked)
+                {
+                    curShape = createTrapezoid();
                 }
 
                 // That way we avoid adding null shapes or the selected ones to the collection while selecting or dragging, or adding the same one again
@@ -252,6 +225,9 @@ namespace PaintGD
             if (curShape != null)
             {
                 curShape.DrawShape(e.Graphics, new Pen(colorDialog1.Color, trackBar1.Value));
+
+                // We have a special treatment for the selected shapes between renders, for it to persist, for example during resizing
+                if (curShape.IsSelected) curShape.SelectShape(g);
             }
 
             // We want to redraw all other drawings, the currently drawn one, won't be included as it is still not finished = added to the list with drawings
@@ -269,12 +245,269 @@ namespace PaintGD
             }
         }
 
+        // Thickness adjustments trackbar
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
             p.Width = trackBar1.Value;
         }
+        // Size adjustments trackbar
+        private void trackBar2_Scroll(object sender, EventArgs e)
+        {
+            var curentValue = trackBar2.Value;
+            var selectedShapes = allShapes.Where(s => s.IsSelected).ToList();
+
+            // This will be the hardcoded value we use to increment the shapes with on each scroll
+            int valueToIncrementSize = 5;
+
+            foreach (Shape shape in selectedShapes)
+            {
+                string curShapeClass = shape.GetType().Name;
+
+                // Since for drawing the Square and Ellipse we rely on the Shape property, which is not
+                // available on the other shapes, we exclusively modify it on those shapes too!
+                switch (curShapeClass)
+                {
+                    case "SquareShape":
+                        SquareShape s = shape as SquareShape;
+
+                        // We handle both directions, downsizing or upsizing the shapes
+                        if (curentValue > previousSizeScrollValue)
+                        {
+                            s.Shape = new Rectangle(s.Shape.X - 5, s.Shape.Y - 5, s.Shape.Width + 10, s.Shape.Height + 10);
+                        }
+                        else if (curentValue < previousSizeScrollValue)
+                        {
+                            s.Shape = new Rectangle(s.Shape.X + 5, s.Shape.Y + 5, s.Shape.Width - 10, s.Shape.Height - 10);
+                        }
+
+                        // In case the value remains the same, we don't do anything - for example scrol with 
+                        // the mouse to the maximum, and continue scrolling will trigger the scroll event handler with the maximum value over
+                        break;
+                    case "EllipseShape":
+                        EllipseShape el = shape as EllipseShape;
+
+                        // We handle both directions, downsizing or upsizing the shapes
+                        if (curentValue > previousSizeScrollValue)
+                        {
+                            el.Shape = new Rectangle(el.Shape.X - 5, el.Shape.Y - 5, el.Shape.Width + 10, el.Shape.Height + 10);
+                        }
+                        else if (curentValue < previousSizeScrollValue)
+                        {
+                            el.Shape = new Rectangle(el.Shape.X + 5, el.Shape.Y + 5, el.Shape.Width - 10, el.Shape.Height - 10);
+                        }
+
+                        // In case the value remains the same, we don't do anything - for example scrol with 
+                        // the mouse to the maximum, and continue scrolling will trigger the scroll event handler with the maximum value over and over again
+                        break;
+                }
+
+                // Here we adjust the Points collection for all shapes based on their Points length:
+                switch (curShapeClass)
+                {
+                    case "SquareShape":
+
+                        // We handle both directions, downsizing or upsizing the shapes
+                        if (curentValue > previousSizeScrollValue)
+                        {
+                            shape.Points = new List<Point>()
+                            {
+                                new Point(shape.Points[0].X - valueToIncrementSize, shape.Points[0].Y - valueToIncrementSize),
+                                new Point(shape.Points[1].X + valueToIncrementSize, shape.Points[1].Y + valueToIncrementSize)
+                            };
+                        }
+                        else if (curentValue < previousSizeScrollValue)
+                        {
+                            shape.Points = new List<Point>()
+                            {
+                                new Point(shape.Points[0].X + valueToIncrementSize, shape.Points[0].Y + valueToIncrementSize),
+                                new Point(shape.Points[1].X - valueToIncrementSize, shape.Points[1].Y - valueToIncrementSize)
+                            };
+                        }
+
+                        break;
+
+                    case "EllipseShape":
+
+                        // We handle both directions, downsizing or upsizing the shapes
+                        if (curentValue > previousSizeScrollValue)
+                        {
+                            shape.Points = new List<Point>()
+                            {
+                                new Point(shape.Points[0].X + valueToIncrementSize, shape.Points[0].Y + valueToIncrementSize),
+                                new Point(shape.Points[1].X - valueToIncrementSize, shape.Points[1].Y - valueToIncrementSize)
+                            };
+                        }
+                        else if (curentValue < previousSizeScrollValue)
+                        {
+                            shape.Points = new List<Point>()
+                            {
+                                new Point(shape.Points[0].X + valueToIncrementSize, shape.Points[0].Y + valueToIncrementSize),
+                                new Point(shape.Points[1].X - valueToIncrementSize, shape.Points[1].Y - valueToIncrementSize)
+                            };
+                        }
+                        break;
+
+                    case "LineShape":
+
+                        // We need to decide here which is the start and endPoint or the Line, otherwise by increasing the size we might compress it instead
+                        // * Because for drawing of the Line we cannot save as first Point the smalles and as second the biggest point, if we make it like that
+                        //   this will crash line drawing. Since this is a unique case, we have the logic here
+                        bool isBackwards = shape.Points[0].X > shape.Points[1].X;
+
+                        // We need to know in which direction it is pointing also
+                        bool isPoinitngDown = shape.Points[1].Y > shape.Points[0].Y;
+
+                        // In LineShape case we have many more cases for directions resizings since Line start could be the bigger point than line end
+                        if (curentValue > previousSizeScrollValue)
+                        {
+                            if (isPoinitngDown)
+                            {
+                                shape.Points = new List<Point>()
+                                {
+                                    new Point
+                                    (
+                                        isBackwards ? shape.Points[0].X + valueToIncrementSize : shape.Points[0].X - valueToIncrementSize,
+                                        isBackwards ? shape.Points[0].Y - valueToIncrementSize : shape.Points[0].Y - valueToIncrementSize
+                                    ),
+                                    new Point
+                                    (
+                                        isBackwards ? shape.Points[1].X - valueToIncrementSize : shape.Points[1].X + valueToIncrementSize,
+                                        isBackwards ? shape.Points[1].Y + valueToIncrementSize : shape.Points[1].Y + valueToIncrementSize
+                                    )
+                                };
+                            }
+                            else
+                            {
+                                shape.Points = new List<Point>()
+                                {
+                                    new Point
+                                    (
+                                        isBackwards ? shape.Points[0].X + valueToIncrementSize : shape.Points[0].X - valueToIncrementSize,
+                                        isBackwards ? shape.Points[0].Y + valueToIncrementSize : shape.Points[0].Y + valueToIncrementSize
+                                    ),
+                                    new Point
+                                    (
+                                        isBackwards ? shape.Points[1].X - valueToIncrementSize : shape.Points[1].X + valueToIncrementSize,
+                                        isBackwards ? shape.Points[1].Y - valueToIncrementSize : shape.Points[1].Y - valueToIncrementSize
+                                    )
+                                };
+                            }
+                        }
+                        else if (curentValue < previousSizeScrollValue)
+                        {
+                            if (isPoinitngDown)
+                            {
+                                shape.Points = new List<Point>()
+                                {
+                                    new Point
+                                    (
+                                        isBackwards ? shape.Points[0].X - valueToIncrementSize : shape.Points[0].X + valueToIncrementSize,
+                                        isBackwards ? shape.Points[0].Y + valueToIncrementSize : shape.Points[0].Y + valueToIncrementSize
+                                    ),
+                                    new Point
+                                    (
+                                        isBackwards ? shape.Points[1].X + valueToIncrementSize : shape.Points[1].X - valueToIncrementSize,
+                                        isBackwards ? shape.Points[1].Y - valueToIncrementSize : shape.Points[1].Y - valueToIncrementSize
+                                    )
+                                };
+                            }
+                            else
+                            {
+                                shape.Points = new List<Point>()
+                                {
+                                    new Point
+                                    (
+                                        isBackwards ? shape.Points[0].X - valueToIncrementSize : shape.Points[0].X + valueToIncrementSize,
+                                        isBackwards ? shape.Points[0].Y - valueToIncrementSize : shape.Points[0].Y - valueToIncrementSize
+                                    ),
+                                    new Point
+                                    (
+                                        isBackwards ? shape.Points[1].X + valueToIncrementSize : shape.Points[1].X - valueToIncrementSize,
+                                        isBackwards ? shape.Points[1].Y + valueToIncrementSize : shape.Points[1].Y + valueToIncrementSize
+                                    )
+                                };
+                            }
+                        }
+                        break;
+
+                    case "TriangleShape":
+
+                        // We handle both directions, downsizing or upsizing the shapes
+                        if (curentValue > previousSizeScrollValue)
+                        {
+                            shape.Points = new List<Point>()
+                            {
+                                new Point(shape.Points[0].X - valueToIncrementSize, shape.Points[0].Y + valueToIncrementSize),
+                                new Point(shape.Points[1].X + valueToIncrementSize, shape.Points[1].Y + valueToIncrementSize),
+                                new Point(shape.Points[2].X, shape.Points[2].Y - valueToIncrementSize)
+                            };
+                        }
+                        else if (curentValue < previousSizeScrollValue)
+                        {
+                            shape.Points = new List<Point>()
+                            {
+                                new Point(shape.Points[0].X + valueToIncrementSize, shape.Points[0].Y - valueToIncrementSize),
+                                new Point(shape.Points[1].X - valueToIncrementSize, shape.Points[1].Y - valueToIncrementSize),
+                                new Point(shape.Points[2].X, shape.Points[2].Y + valueToIncrementSize)
+                            };
+                        }
+                        break;
+
+                    case "TrapezoidShape":
+
+                        // We handle both directions, downsizing or upsizing the shapes
+                        if (curentValue > previousSizeScrollValue)
+                        {
+                            shape.Points = new List<Point>()
+                            {
+                                new Point(shape.Points[0].X - valueToIncrementSize, shape.Points[0].Y + valueToIncrementSize),
+                                new Point(shape.Points[1].X + valueToIncrementSize, shape.Points[1].Y + valueToIncrementSize),
+                                new Point(shape.Points[2].X + valueToIncrementSize, shape.Points[2].Y - valueToIncrementSize),
+                                new Point(shape.Points[3].X - valueToIncrementSize, shape.Points[3].Y - valueToIncrementSize)
+                            };
+                        }
+                        else if (curentValue < previousSizeScrollValue)
+                        {
+                            shape.Points = new List<Point>()
+                            {
+                                new Point(shape.Points[0].X + valueToIncrementSize, shape.Points[0].Y - valueToIncrementSize),
+                                new Point(shape.Points[1].X - valueToIncrementSize, shape.Points[1].Y - valueToIncrementSize),
+                                new Point(shape.Points[2].X - valueToIncrementSize, shape.Points[2].Y + valueToIncrementSize),
+                                new Point(shape.Points[3].X + valueToIncrementSize, shape.Points[3].Y + valueToIncrementSize)
+                            };
+                        }
+                        break;
+                }
+            }
+
+            // Rerender all of the shapes
+            panel1.Refresh();
+            previousSizeScrollValue = curentValue;
+
+        }
+
+
 
         // Since the logic is hard we make some factory functions
+        private TriangleShape createTriangle()
+        {
+            var sideOfPerfectTriangle = endLocation.X - startLocation.X;
+
+            // The height will always be upwards
+            double height = Math.Abs(sideOfPerfectTriangle * Math.Sqrt(3) / 2);
+
+            // If we start drawing the triangle backwards we need to handle the position of the topX
+            int topX = startLocation.X + sideOfPerfectTriangle / 2;
+            int topY = startLocation.Y - (int)height;
+
+            // In order to be able to draw backwards and have the correct Points collection later for select rect
+            int startX = Math.Min(startLocation.X, endLocation.X);
+            int startY = Math.Min(startLocation.Y, endLocation.Y);
+
+            int endX = Math.Max(startLocation.X, endLocation.X);
+
+            return new TriangleShape(startX, startY, endX, startY, topX, topY);
+        }
         private TrapezoidShape createTrapezoid()
         {
             // This is hard-coded, we need to adjust it based on the trapezoid
@@ -306,20 +539,35 @@ namespace PaintGD
                 rucX, rucY
             );
         }
-        private TriangleShape createTriangle()
+        private SquareShape createSquare()
         {
-            var sideOfPerfectTriangle = endLocation.X - startLocation.X;
 
-            // The height will always be upwards
-            double height = Math.Abs(sideOfPerfectTriangle * Math.Sqrt(3) / 2);
+            // We need positive values for the width and height property throughout all code
+            int width = Math.Abs(endLocation.X - startLocation.X);
+            int height = Math.Abs(endLocation.Y - startLocation.Y);
 
-            // If we start drawing the triangle backwards we need to handle the position of the topX
-            int topX = startLocation.X + sideOfPerfectTriangle / 2;
-            var topY = startLocation.Y - (int)height;
+            // Ensure that we get the left most Points for the start, as sometimes we may draw backwards
+            int x = Math.Min(startLocation.X, endLocation.X);
+            int y = Math.Min(startLocation.Y, endLocation.Y);
 
-            return new TriangleShape(startLocation.X, startLocation.Y, endLocation.X, startLocation.Y, topX, topY);
+            return new SquareShape(x, y, width, height);
         }
+        private EllipseShape createEllipse()
+        {
+            // We need positive values for the width and height property throughout all code
+            int width = Math.Abs(endLocation.X - startLocation.X);
+            int height = Math.Abs(endLocation.Y - startLocation.Y);
 
+            // In order to be able to draw backwards we need to get the correct start for our drawing
+            int x = Math.Min(startLocation.X, endLocation.X);
+            int y = Math.Min(startLocation.Y, endLocation.Y);
+
+            return new EllipseShape(x, y, width, height);
+        }
+        private LineShape createLine()
+        {
+            return new LineShape(startLocation.X, startLocation.Y, endLocation.X, endLocation.Y);
+        }
         private Shape createCustomShape()
         {
             return null;
