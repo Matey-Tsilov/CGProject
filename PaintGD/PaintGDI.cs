@@ -1,4 +1,6 @@
+using Newtonsoft.Json;
 using PaintGD.Model;
+using System.Text.RegularExpressions;
 
 namespace PaintGD
 {
@@ -237,7 +239,7 @@ namespace PaintGD
                     .ForEach(cur =>
                     {
                         // We can access the drawnPen property as this won't be the first time they are redrawn = they have it set!
-                        cur.DrawShape(e.Graphics, cur.DrawnPen);
+                        cur.DrawShape(e.Graphics, new Pen(cur.DrawnPenColor, 3));
 
                         // We have a special treatment for the selected shapes between renders, for them to persist
                         if (cur.IsSelected) cur.SelectShape(g);
@@ -268,22 +270,24 @@ namespace PaintGD
                 switch (curShapeClass)
                 {
                     case "SquareShape":
+
                         SquareShape s = shape as SquareShape;
 
                         // We handle both directions, downsizing or upsizing the shapes
                         if (curentValue > previousSizeScrollValue)
                         {
-                            s.Shape = new Rectangle(s.Shape.X - 5, s.Shape.Y - 5, s.Shape.Width + 10, s.Shape.Height + 10);
+                            s.Shape = new Rectangle(s.Shape.X - valueToIncrementSize, s.Shape.Y - valueToIncrementSize, s.Shape.Width + valueToIncrementSize * 2, s.Shape.Height + valueToIncrementSize * 2);
                         }
                         else if (curentValue < previousSizeScrollValue)
                         {
-                            s.Shape = new Rectangle(s.Shape.X + 5, s.Shape.Y + 5, s.Shape.Width - 10, s.Shape.Height - 10);
+                            s.Shape = new Rectangle(s.Shape.X + valueToIncrementSize, s.Shape.Y + valueToIncrementSize, s.Shape.Width - valueToIncrementSize * 2, s.Shape.Height - valueToIncrementSize * 2);
                         }
 
                         // In case the value remains the same, we don't do anything - for example scrol with 
                         // the mouse to the maximum, and continue scrolling will trigger the scroll event handler with the maximum value over
                         break;
                     case "EllipseShape":
+
                         EllipseShape el = shape as EllipseShape;
 
                         // We handle both directions, downsizing or upsizing the shapes
@@ -485,7 +489,76 @@ namespace PaintGD
             previousSizeScrollValue = curentValue;
 
         }
+        private void ExportBtn_Click(object sender, EventArgs e)
+        {
+            saveFileDialog1.ShowDialog();
 
+            string json = JsonConvert.SerializeObject(allShapes, Formatting.Indented);
+
+            // We get the selected name and place = path for teh current file
+            string filePath = saveFileDialog1.FileName;
+
+            // We delete the files' contents if it already exists
+            if (File.Exists(filePath))
+            {
+                File.WriteAllText(filePath, string.Empty);
+            }
+            File.WriteAllText(filePath, json);
+
+            // We remove all Shapes from the list and have a clear canva now
+            curShape = null;
+            allShapes.Clear();
+            panel1.Refresh();
+        }
+
+        // Import Button
+        private void button4_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.ShowDialog();
+
+            string filePath = openFileDialog1.FileName;
+            if (File.Exists(filePath))
+            {
+                var text = File.ReadAllText(filePath);
+                var collectionJsonObjects = JsonConvert.DeserializeObject<List<object>>(text);
+
+                foreach (var obj in collectionJsonObjects)
+                {
+                    // In here we just get every string object back to original Shape obj
+                    Shape deserializedObject = DeserializeObjectIntoCurrentShape(JsonConvert.SerializeObject(obj));
+                    allShapes.Add(deserializedObject);
+                }
+            }
+
+            // We need to assign a value to the curShape otherwise it will be null!
+            curShape = allShapes.FirstOrDefault();
+            panel1.Refresh();
+        }
+
+        // This will be our custom deserializer based on the Type property hidden in each of the Shapes
+        private Shape DeserializeObjectIntoCurrentShape(string obj)
+        {
+            Shape shape = null;
+
+            string pattern = @"""Type"":\s*""([^""]+)""";
+
+            // Match the pattern in the JSON string
+            Match match = Regex.Match(obj, pattern);
+
+            // We extract the string Type of the shape
+            string shapeType = match.Groups[1].Value;
+
+            switch (shapeType)
+            {
+                case "LineShape": shape = JsonConvert.DeserializeObject<LineShape>(obj); break;
+                case "SquareShape": shape = JsonConvert.DeserializeObject<SquareShape>(obj); break;
+                case "EllipseShape": shape = JsonConvert.DeserializeObject<EllipseShape>(obj); break;
+                case "TriangleShape": shape = JsonConvert.DeserializeObject<TriangleShape>(obj); break;
+                case "TrapezoidShape": shape = JsonConvert.DeserializeObject<TrapezoidShape>(obj); break;
+            }
+
+            return shape;
+        }
 
 
         // Since the logic is hard we make some factory functions

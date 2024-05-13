@@ -1,4 +1,5 @@
-﻿using System.Drawing.Drawing2D;
+﻿using Newtonsoft.Json;
+using System.Drawing.Drawing2D;
 
 namespace PaintGD.Model
 {
@@ -8,6 +9,7 @@ namespace PaintGD.Model
         {
             Points = new List<Point>() { new Point(x, y), new Point(x1, y1), new Point(x2, y2) };
             ShapeCenter = new Point((x + x1) / 2, (y + y2) / 2);
+            Type = "TriangleShape";
         }
 
         public TriangleShape(Point center, int halfWidth, int halfHeight)
@@ -19,6 +21,25 @@ namespace PaintGD.Model
                 new Point(center.X, center.Y - halfHeight),
             };
             ShapeCenter = center;
+            Type = "TriangleShape";
+        }
+
+        // This will be our JSONconstructor for the custom deserialization
+        [JsonConstructor]
+        public TriangleShape(string[] Points, string ShapeCenter, string DrawnPenColor, bool IsSelected)
+        {
+
+            int[][] PointsNums = Points.Select(arr => arr.Split(", ").Select(int.Parse).ToArray()).ToArray();
+            this.Points = PointsNums.Select(arr => new Point(arr[0], arr[1])).ToList();
+
+            int[] ShapeCenterNumbers = ShapeCenter.Split(", ").Select(int.Parse).ToArray();
+            this.ShapeCenter = new Point(ShapeCenterNumbers[0], ShapeCenterNumbers[1]);
+
+            this.DrawnPenColor = ColorTranslator.FromHtml(DrawnPenColor);
+
+            this.IsSelected = IsSelected;
+
+            this.Type = "TriangleShape";
         }
 
         public override void DrawShape(Graphics g, Pen p)
@@ -27,7 +48,7 @@ namespace PaintGD.Model
             g.DrawPolygon(p, pointsF);
 
             // We memorize the color and width of the drawn shape
-            DrawnPen = p;
+            DrawnPenColor = p.Color;
         }
         public override void SelectShape(Graphics g)
         {
@@ -38,7 +59,11 @@ namespace PaintGD.Model
                 Math.Abs(Points[1].X - Points[0].X),
                 Math.Abs(Points[2].Y - Points[1].Y));
 
-            g.DrawRectangle(new Pen(Color.Blue, 2), selectRect);
+            // Convert the hexadecimal color string to a Color object
+            string hexColor = "#3399FF";
+            Color color = ColorTranslator.FromHtml(hexColor);
+
+            g.DrawRectangle(new Pen(color, 2), selectRect);
 
             // Draw shape center plus sign
             g.DrawLine(new Pen(Color.Red, 1), new Point(ShapeCenter.X, ShapeCenter.Y - 5), new Point(ShapeCenter.X, ShapeCenter.Y + 5));

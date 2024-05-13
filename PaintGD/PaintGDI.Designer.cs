@@ -46,15 +46,15 @@
             ThicknessLevel = new Label();
             bindingSource1 = new BindingSource(components);
             trackBar2 = new TrackBar();
-            trackBar3 = new TrackBar();
             label4 = new Label();
-            Rotate = new Label();
             textBox1 = new TextBox();
             ExportBtn = new Button();
+            button4 = new Button();
+            openFileDialog1 = new OpenFileDialog();
+            saveFileDialog1 = new SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bindingSource1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trackBar2).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)trackBar3).BeginInit();
             SuspendLayout();
             // 
             // DrawSquare
@@ -113,7 +113,7 @@
             // button1
             // 
             button1.BackColor = SystemColors.Window;
-            button1.Location = new Point(62, 344);
+            button1.Location = new Point(62, 363);
             button1.Name = "button1";
             button1.Size = new Size(92, 29);
             button1.TabIndex = 6;
@@ -123,7 +123,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(62, 309);
+            button2.Location = new Point(62, 319);
             button2.Name = "button2";
             button2.Size = new Size(92, 29);
             button2.TabIndex = 7;
@@ -185,7 +185,7 @@
             // 
             // trackBar1
             // 
-            trackBar1.Location = new Point(12, 458);
+            trackBar1.Location = new Point(12, 523);
             trackBar1.Minimum = 1;
             trackBar1.Name = "trackBar1";
             trackBar1.Size = new Size(185, 56);
@@ -196,7 +196,7 @@
             // ThicknessLevel
             // 
             ThicknessLevel.AutoSize = true;
-            ThicknessLevel.Location = new Point(46, 423);
+            ThicknessLevel.Location = new Point(48, 500);
             ThicknessLevel.Name = "ThicknessLevel";
             ThicknessLevel.Size = new Size(71, 20);
             ThicknessLevel.TabIndex = 15;
@@ -206,70 +206,72 @@
             // 
             trackBar2.Cursor = Cursors.VSplit;
             trackBar2.LargeChange = 1;
-            trackBar2.Location = new Point(12, 582);
+            trackBar2.Location = new Point(12, 658);
             trackBar2.Maximum = 25;
             trackBar2.Name = "trackBar2";
             trackBar2.Size = new Size(185, 56);
             trackBar2.TabIndex = 16;
             trackBar2.Scroll += trackBar2_Scroll;
             // 
-            // trackBar3
-            // 
-            trackBar3.Location = new Point(12, 654);
-            trackBar3.Maximum = 360;
-            trackBar3.Name = "trackBar3";
-            trackBar3.Size = new Size(185, 56);
-            trackBar3.TabIndex = 17;
-            trackBar3.TickFrequency = 10;
-            // 
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(46, 559);
+            label4.Location = new Point(46, 635);
             label4.Name = "label4";
-            label4.Size = new Size(36, 20);
+            label4.Size = new Size(51, 20);
             label4.TabIndex = 18;
-            label4.Text = "Size";
-            // 
-            // Rotate
-            // 
-            Rotate.AutoSize = true;
-            Rotate.Location = new Point(46, 631);
-            Rotate.Name = "Rotate";
-            Rotate.Size = new Size(53, 20);
-            Rotate.TabIndex = 19;
-            Rotate.Text = "Rotate";
+            label4.Text = "Resize";
             // 
             // textBox1
             // 
             textBox1.BackColor = SystemColors.ControlLight;
-            textBox1.Location = new Point(12, 511);
+            textBox1.Location = new Point(12, 585);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(185, 27);
             textBox1.TabIndex = 20;
-            textBox1.Text = "Selected Shapes";
+            textBox1.Text = "Selected shapes";
             textBox1.TextAlign = HorizontalAlignment.Center;
             // 
             // ExportBtn
             // 
             ExportBtn.BackColor = SystemColors.Window;
-            ExportBtn.Location = new Point(62, 379);
+            ExportBtn.Location = new Point(62, 408);
             ExportBtn.Name = "ExportBtn";
             ExportBtn.Size = new Size(92, 29);
             ExportBtn.TabIndex = 21;
-            ExportBtn.Text = "Export";
+            ExportBtn.Text = "Export All";
             ExportBtn.UseVisualStyleBackColor = false;
+            ExportBtn.Click += ExportBtn_Click;
+            // 
+            // button4
+            // 
+            button4.BackColor = SystemColors.Window;
+            button4.Location = new Point(62, 453);
+            button4.Name = "button4";
+            button4.Size = new Size(92, 29);
+            button4.TabIndex = 22;
+            button4.Text = "Import";
+            button4.UseVisualStyleBackColor = false;
+            button4.Click += button4_Click;
+            // 
+            // openFileDialog1
+            // 
+            openFileDialog1.FileName = "openFileDialog1";
+            openFileDialog1.Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*";
+            // 
+            // saveFileDialog1
+            // 
+            saveFileDialog1.Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*";
             // 
             // PaintGDI
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1151, 760);
+            Controls.Add(button4);
             Controls.Add(ExportBtn);
             Controls.Add(textBox1);
-            Controls.Add(Rotate);
             Controls.Add(label4);
-            Controls.Add(trackBar3);
             Controls.Add(trackBar2);
             Controls.Add(ThicknessLevel);
             Controls.Add(trackBar1);
@@ -291,7 +293,6 @@
             ((System.ComponentModel.ISupportInitialize)trackBar1).EndInit();
             ((System.ComponentModel.ISupportInitialize)bindingSource1).EndInit();
             ((System.ComponentModel.ISupportInitialize)trackBar2).EndInit();
-            ((System.ComponentModel.ISupportInitialize)trackBar3).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -315,10 +316,11 @@
         private Label ThicknessLevel;
         private BindingSource bindingSource1;
         private TrackBar trackBar2;
-        private TrackBar trackBar3;
         private Label label4;
-        private Label Rotate;
         private TextBox textBox1;
         private Button ExportBtn;
+        private Button button4;
+        private OpenFileDialog openFileDialog1;
+        private SaveFileDialog saveFileDialog1;
     }
 }
