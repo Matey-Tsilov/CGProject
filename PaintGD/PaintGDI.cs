@@ -24,6 +24,10 @@ namespace PaintGD
             g = panel1.CreateGraphics();
             p = new Pen(colorDialog1.Color, trackBar1.Value);
             allShapes = new List<Shape>();
+
+            // Set KeyPreview object to true to allow the form to process 
+            // the key before the control with focus processes it.
+            this.KeyPreview = true;
         }
 
         private void Mouse_Down(object sender, MouseEventArgs e)
@@ -252,6 +256,7 @@ namespace PaintGD
         {
             p.Width = trackBar1.Value;
         }
+
         // Size adjustments trackbar
         private void trackBar2_Scroll(object sender, EventArgs e)
         {
@@ -489,6 +494,8 @@ namespace PaintGD
             previousSizeScrollValue = curentValue;
 
         }
+
+        // Export Button
         private void ExportBtn_Click(object sender, EventArgs e)
         {
             saveFileDialog1.ShowDialog();
@@ -560,6 +567,18 @@ namespace PaintGD
             return shape;
         }
 
+        // A  The logic for DEL key is implemented here 
+        private void PaintGDI_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Back)
+            {
+                allShapes = allShapes.Where(s => s.IsSelected == false).ToList();
+            }
+
+            // We need to assign a value to the curShape otherwise it will be null!
+            curShape = allShapes.FirstOrDefault();
+            panel1.Refresh();
+        }
 
         // Since the logic is hard we make some factory functions
         private TriangleShape createTriangle()

@@ -113,7 +113,7 @@
             // button1
             // 
             button1.BackColor = SystemColors.Window;
-            button1.Location = new Point(62, 363);
+            button1.Location = new Point(62, 411);
             button1.Name = "button1";
             button1.Size = new Size(92, 29);
             button1.TabIndex = 6;
@@ -123,7 +123,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(62, 319);
+            button2.Location = new Point(62, 376);
             button2.Name = "button2";
             button2.Size = new Size(92, 29);
             button2.TabIndex = 7;
@@ -146,7 +146,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(46, 286);
+            label2.Location = new Point(46, 339);
             label2.Name = "label2";
             label2.Size = new Size(58, 20);
             label2.TabIndex = 9;
@@ -155,7 +155,7 @@
             // SelectShape
             // 
             SelectShape.AutoSize = true;
-            SelectShape.Location = new Point(62, 248);
+            SelectShape.Location = new Point(62, 293);
             SelectShape.Name = "SelectShape";
             SelectShape.Size = new Size(115, 24);
             SelectShape.TabIndex = 10;
@@ -166,7 +166,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(46, 216);
+            label3.Location = new Point(46, 270);
             label3.Name = "label3";
             label3.Size = new Size(51, 20);
             label3.TabIndex = 11;
@@ -185,7 +185,7 @@
             // 
             // trackBar1
             // 
-            trackBar1.Location = new Point(12, 523);
+            trackBar1.Location = new Point(12, 558);
             trackBar1.Minimum = 1;
             trackBar1.Name = "trackBar1";
             trackBar1.Size = new Size(185, 56);
@@ -196,7 +196,7 @@
             // ThicknessLevel
             // 
             ThicknessLevel.AutoSize = true;
-            ThicknessLevel.Location = new Point(48, 500);
+            ThicknessLevel.Location = new Point(48, 530);
             ThicknessLevel.Name = "ThicknessLevel";
             ThicknessLevel.Size = new Size(71, 20);
             ThicknessLevel.TabIndex = 15;
@@ -206,7 +206,7 @@
             // 
             trackBar2.Cursor = Cursors.VSplit;
             trackBar2.LargeChange = 1;
-            trackBar2.Location = new Point(12, 658);
+            trackBar2.Location = new Point(12, 692);
             trackBar2.Maximum = 25;
             trackBar2.Name = "trackBar2";
             trackBar2.Size = new Size(185, 56);
@@ -216,7 +216,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(46, 635);
+            label4.Location = new Point(46, 669);
             label4.Name = "label4";
             label4.Size = new Size(51, 20);
             label4.TabIndex = 18;
@@ -225,7 +225,7 @@
             // textBox1
             // 
             textBox1.BackColor = SystemColors.ControlLight;
-            textBox1.Location = new Point(12, 585);
+            textBox1.Location = new Point(12, 620);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(185, 27);
             textBox1.TabIndex = 20;
@@ -235,7 +235,7 @@
             // ExportBtn
             // 
             ExportBtn.BackColor = SystemColors.Window;
-            ExportBtn.Location = new Point(62, 408);
+            ExportBtn.Location = new Point(62, 446);
             ExportBtn.Name = "ExportBtn";
             ExportBtn.Size = new Size(92, 29);
             ExportBtn.TabIndex = 21;
@@ -246,7 +246,7 @@
             // button4
             // 
             button4.BackColor = SystemColors.Window;
-            button4.Location = new Point(62, 453);
+            button4.Location = new Point(62, 481);
             button4.Name = "button4";
             button4.Size = new Size(92, 29);
             button4.TabIndex = 22;
@@ -290,6 +290,7 @@
             DoubleBuffered = true;
             Name = "PaintGDI";
             Text = "PaintGDI";
+            KeyDown += PaintGDI_KeyDown;
             ((System.ComponentModel.ISupportInitialize)trackBar1).EndInit();
             ((System.ComponentModel.ISupportInitialize)bindingSource1).EndInit();
             ((System.ComponentModel.ISupportInitialize)trackBar2).EndInit();
