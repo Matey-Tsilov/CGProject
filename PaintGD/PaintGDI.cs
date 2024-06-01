@@ -70,7 +70,8 @@ namespace PaintGD
                             else
                             {
                                 // We do it manually from here
-                                selectedShape.IsSelected = false;
+                                //selectedShape.IsSelected = false;
+                                selectedShape.DeselectShape(panel1);
                             }
                         }
                     }
@@ -119,7 +120,8 @@ namespace PaintGD
                             curShape = new EllipseShape(newCenter, shapeHalfWidth, shapeHalfHeight);
                             break;
                         case "LineShape":
-                            curShape = new LineShape(newCenter, shapeHalfWidth, shapeHalfHeight);
+                            bool isUp = curShape.Points[0].Y > curShape.Points[1].Y;
+                            curShape = new LineShape(newCenter, shapeHalfWidth, shapeHalfHeight, isUp);
                             break;
                         case "TriangleShape":
                             shapeHalfHeight = Math.Abs(curShape.Points[0].Y - curShape.Points[2].Y) / 2;
@@ -129,6 +131,9 @@ namespace PaintGD
                             shapeHalfHeight = Math.Abs(curShape.Points[0].Y - curShape.Points[2].Y) / 2;
                             int indent = curShape.Points[3].X - curShape.Points[0].X;
                             curShape = new TrapezoidShape(newCenter, shapeHalfWidth, shapeHalfHeight, indent);
+                            break;
+                        case "CustomShape":
+                            //TODO: Create dragging shape, using center constructor
                             break;
                     }
                 }
@@ -155,6 +160,11 @@ namespace PaintGD
                     {
                         curShape = createTrapezoid();
                     }
+                    else if (DrawCustomShape.Checked)
+                    {
+                        curShape = createCustomShape();
+                    }
+
                 }
 
                 // Apply changes to canva
@@ -190,6 +200,10 @@ namespace PaintGD
                 {
                     curShape = createTrapezoid();
                 }
+                else if (DrawCustomShape.Checked)
+                {
+                    curShape = createCustomShape();
+                }
 
                 // That way we avoid adding null shapes or the selected ones to the collection while selecting or dragging, or adding the same one again
                 if (curShape != null && !curShape.IsSelected && !allShapes.Contains(curShape))
@@ -205,14 +219,15 @@ namespace PaintGD
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+
+        private void ChangeColor(object sender, EventArgs e)
         {
             colorDialog1.ShowDialog();
             button1.BackColor = colorDialog1.Color;
             p.Color = colorDialog1.Color;
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void ClearCanva(object sender, EventArgs e)
         {
             Graphics g = panel1.CreateGraphics();
             g.Clear(Color.White);
@@ -224,7 +239,7 @@ namespace PaintGD
             panel1.Refresh();
         }
 
-        private void panel1_Paint(object sender, PaintEventArgs e)
+        private void PaintOnCanva(object sender, PaintEventArgs e)
         {
             // This lines are for the dynamic drawing, before adding to the collection,
             // not connected with persisting the drawings
@@ -237,13 +252,14 @@ namespace PaintGD
             }
 
             // We want to redraw all other drawings, the currently drawn one, won't be included as it is still not finished = added to the list with drawings
+            // That is why we have the upper method
             if (allShapes.Count != 0)
             {
                 allShapes.Where(s => s != curShape).ToList()
                     .ForEach(cur =>
                     {
                         // We can access the drawnPen property as this won't be the first time they are redrawn = they have it set!
-                        cur.DrawShape(e.Graphics, new Pen(cur.DrawnPenColor, 3));
+                        cur.DrawShape(e.Graphics, new Pen(cur.DrawnPenColor, cur.DrawnPenSize));
 
                         // We have a special treatment for the selected shapes between renders, for them to persist
                         if (cur.IsSelected) cur.SelectShape(g);
@@ -251,14 +267,12 @@ namespace PaintGD
             }
         }
 
-        // Thickness adjustments trackbar
-        private void trackBar1_Scroll(object sender, EventArgs e)
+        private void AdjustThickness(object sender, EventArgs e)
         {
             p.Width = trackBar1.Value;
         }
 
-        // Size adjustments trackbar
-        private void trackBar2_Scroll(object sender, EventArgs e)
+        private void AdjustSize(object sender, EventArgs e)
         {
             var curentValue = trackBar2.Value;
             var selectedShapes = allShapes.Where(s => s.IsSelected).ToList();
@@ -305,7 +319,7 @@ namespace PaintGD
                             el.Shape = new Rectangle(el.Shape.X + 5, el.Shape.Y + 5, el.Shape.Width - 10, el.Shape.Height - 10);
                         }
 
-                        // In case the value remains the same, we don't do anything - for example scrol with 
+                        // In case the value remains the same, we don't do anything - for example scroll with 
                         // the mouse to the maximum, and continue scrolling will trigger the scroll event handler with the maximum value over and over again
                         break;
                 }
@@ -495,14 +509,13 @@ namespace PaintGD
 
         }
 
-        // Export Button
-        private void ExportBtn_Click(object sender, EventArgs e)
+        private void ExportShapes(object sender, EventArgs e)
         {
             saveFileDialog1.ShowDialog();
 
             string json = JsonConvert.SerializeObject(allShapes, Formatting.Indented);
 
-            // We get the selected name and place = path for teh current file
+            // We get the selected name and place = path for the current file
             string filePath = saveFileDialog1.FileName;
 
             // We delete the files' contents if it already exists
@@ -518,8 +531,7 @@ namespace PaintGD
             panel1.Refresh();
         }
 
-        // Import Button
-        private void button4_Click(object sender, EventArgs e)
+        private void ImportShapes(object sender, EventArgs e)
         {
             openFileDialog1.ShowDialog();
 
@@ -542,6 +554,20 @@ namespace PaintGD
             panel1.Refresh();
         }
 
+        private void PressKey(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Back)
+            {
+                allShapes = allShapes.Where(s => s.IsSelected == false).ToList();
+            }
+
+            // We need to assign a value to the curShape otherwise it will be null!
+            curShape = allShapes.FirstOrDefault();
+            panel1.Refresh();
+        }
+
+
+
         // This will be our custom deserializer based on the Type property hidden in each of the Shapes
         private Shape DeserializeObjectIntoCurrentShape(string obj)
         {
@@ -562,23 +588,13 @@ namespace PaintGD
                 case "EllipseShape": shape = JsonConvert.DeserializeObject<EllipseShape>(obj); break;
                 case "TriangleShape": shape = JsonConvert.DeserializeObject<TriangleShape>(obj); break;
                 case "TrapezoidShape": shape = JsonConvert.DeserializeObject<TrapezoidShape>(obj); break;
+                case "CustomShape": shape = JsonConvert.DeserializeObject<CustomShape>(obj); break;
             }
 
             return shape;
         }
 
-        // A  The logic for DEL key is implemented here 
-        private void PaintGDI_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Back)
-            {
-                allShapes = allShapes.Where(s => s.IsSelected == false).ToList();
-            }
 
-            // We need to assign a value to the curShape otherwise it will be null!
-            curShape = allShapes.FirstOrDefault();
-            panel1.Refresh();
-        }
 
         // Since the logic is hard we make some factory functions
         private TriangleShape createTriangle()
@@ -660,7 +676,7 @@ namespace PaintGD
         {
             return new LineShape(startLocation.X, startLocation.Y, endLocation.X, endLocation.Y);
         }
-        private Shape createCustomShape()
+        private CustomShape createCustomShape()
         {
             return null;
         }

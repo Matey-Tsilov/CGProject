@@ -52,6 +52,7 @@
             button4 = new Button();
             openFileDialog1 = new OpenFileDialog();
             saveFileDialog1 = new SaveFileDialog();
+            DrawCustomShape = new RadioButton();
             ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bindingSource1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trackBar2).BeginInit();
@@ -119,7 +120,7 @@
             button1.TabIndex = 6;
             button1.Text = "Color";
             button1.UseVisualStyleBackColor = false;
-            button1.Click += button1_Click;
+            button1.Click += ChangeColor;
             // 
             // button2
             // 
@@ -129,7 +130,7 @@
             button2.TabIndex = 7;
             button2.Text = "Clear";
             button2.UseVisualStyleBackColor = true;
-            button2.Click += button2_Click;
+            button2.Click += ClearCanva;
             // 
             // panel1
             // 
@@ -138,7 +139,7 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(904, 698);
             panel1.TabIndex = 8;
-            panel1.Paint += panel1_Paint;
+            panel1.Paint += PaintOnCanva;
             panel1.MouseDown += Mouse_Down;
             panel1.MouseMove += Mouse_Move;
             panel1.MouseUp += Mouse_Up;
@@ -191,7 +192,7 @@
             trackBar1.Size = new Size(185, 56);
             trackBar1.TabIndex = 14;
             trackBar1.Value = 3;
-            trackBar1.Scroll += trackBar1_Scroll;
+            trackBar1.Scroll += AdjustThickness;
             // 
             // ThicknessLevel
             // 
@@ -211,7 +212,7 @@
             trackBar2.Name = "trackBar2";
             trackBar2.Size = new Size(185, 56);
             trackBar2.TabIndex = 16;
-            trackBar2.Scroll += trackBar2_Scroll;
+            trackBar2.Scroll += AdjustSize;
             // 
             // label4
             // 
@@ -241,7 +242,7 @@
             ExportBtn.TabIndex = 21;
             ExportBtn.Text = "Export All";
             ExportBtn.UseVisualStyleBackColor = false;
-            ExportBtn.Click += ExportBtn_Click;
+            ExportBtn.Click += ExportShapes;
             // 
             // button4
             // 
@@ -252,7 +253,7 @@
             button4.TabIndex = 22;
             button4.Text = "Import";
             button4.UseVisualStyleBackColor = false;
-            button4.Click += button4_Click;
+            button4.Click += ImportShapes;
             // 
             // openFileDialog1
             // 
@@ -263,11 +264,24 @@
             // 
             saveFileDialog1.Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*";
             // 
+            // DrawCustomShape
+            // 
+            DrawCustomShape.AutoSize = true;
+            DrawCustomShape.Location = new Point(62, 208);
+            DrawCustomShape.Name = "DrawCustomShape";
+            DrawCustomShape.Size = new Size(121, 24);
+            DrawCustomShape.TabIndex = 24;
+            DrawCustomShape.TabStop = true;
+            DrawCustomShape.Text = "CustomShape";
+            DrawCustomShape.UseVisualStyleBackColor = true;
+            // 
             // PaintGDI
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1151, 760);
+            Controls.Add(DrawCustomShape);
+            Controls.Add(label5);
             Controls.Add(button4);
             Controls.Add(ExportBtn);
             Controls.Add(textBox1);
@@ -290,7 +304,7 @@
             DoubleBuffered = true;
             Name = "PaintGDI";
             Text = "PaintGDI";
-            KeyDown += PaintGDI_KeyDown;
+            KeyDown += PressKey;
             ((System.ComponentModel.ISupportInitialize)trackBar1).EndInit();
             ((System.ComponentModel.ISupportInitialize)bindingSource1).EndInit();
             ((System.ComponentModel.ISupportInitialize)trackBar2).EndInit();
@@ -323,5 +337,7 @@
         private Button button4;
         private OpenFileDialog openFileDialog1;
         private SaveFileDialog saveFileDialog1;
+        private Label label5;
+        private RadioButton DrawCustomShape;
     }
 }

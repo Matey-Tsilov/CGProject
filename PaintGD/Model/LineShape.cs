@@ -10,13 +10,25 @@ namespace PaintGD.Model
             ShapeCenter = new Point((int)Points.Average(propa => propa.X), (int)Points.Average(propa => propa.Y));
             Type = "LineShape";
         }
-        public LineShape(Point center, int halfWidth, int halfHeight)
+        public LineShape(Point center, int halfWidth, int halfHeight, bool isUp)
         {
+            // We have conditional statements to not rotate line on dragging
+            if (isUp)
+            {
+                Points = new List<Point>() {
+                new Point(center.X - halfWidth, center.Y + halfHeight),
+                new Point(center.X + halfWidth, center.Y - halfHeight)
+                };
+            }
             // We need those Points in all shapes to calculate the width, while dragging
-            Points = new List<Point>() {
+            else
+            {
+                Points = new List<Point>() {
                 new Point(center.X - halfWidth, center.Y - halfHeight),
                 new Point(center.X + halfWidth, center.Y + halfHeight)
-            };
+                };
+            }
+
             ShapeCenter = center;
             Type = "LineShape";
         }
@@ -45,6 +57,7 @@ namespace PaintGD.Model
 
             // We memorize the color and width of the drawn shape
             DrawnPenColor = p.Color;
+            DrawnPenSize = p.Width;
         }
         public override void SelectShape(Graphics g)
         {

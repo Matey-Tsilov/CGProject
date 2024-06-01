@@ -48,6 +48,7 @@ namespace PaintGD.Model
 
             // We memorize the color and width of the drawn shape
             DrawnPenColor = p.Color;
+            DrawnPenSize = p.Width;
         }
 
         public override void SelectShape(Graphics g)
