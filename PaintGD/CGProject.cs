@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace PaintGD
 {
-    public partial class PaintGDI : Form
+    public partial class CGProject : Form
     {
         List<Shape> allShapes;
         Shape curShape;
@@ -18,7 +18,7 @@ namespace PaintGD
 
         bool isMouseDown = false;
         bool isDragging = false;
-        public PaintGDI()
+        public CGProject()
         {
             InitializeComponent();
             g = panel1.CreateGraphics();

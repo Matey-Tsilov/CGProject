@@ -1,6 +1,6 @@
 ﻿namespace PaintGD
 {
-    partial class PaintGDI
+    partial class CGProject
     {
         /// <summary>
         ///  Required designer variable.

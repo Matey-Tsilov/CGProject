@@ -9,7 +9,7 @@ namespace PaintGD
         static void Main()
         {
             ApplicationConfiguration.Initialize();
-            Application.Run(new PaintGDI());
+            Application.Run(new CGProject());
         }
     }
 }
