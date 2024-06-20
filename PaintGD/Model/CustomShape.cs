@@ -4,38 +4,39 @@ namespace PaintGD.Model
 {
     public class CustomShape : Shape
     {
-        //public Rectangle Shape { get; set; }
-        public CustomShape(int x, int y, int x1, int y1, int x2, int y2)
+        // The complex Shape model:
+        public Rectangle BaseShape { get; set; }
+        public List<LineShape> lineShapes { get; set; }
+        public CustomShape(int x, int y, int width, int height, List<LineShape> lines)
         {
-            //Points = new List<Point>() { new Point(x, y), new Point(x1, y1), new Point(x2, y2) };
-            //ShapeCenter = new Point((x + x1) / 2, (y + y2) / 2);
+            Points = new List<Point>() { new Point(x, y), new Point(x + width, y + height) };
+            ShapeCenter = new Point(x + width / 2, y + height / 2);
+            BaseShape = new Rectangle(x, y, width, height);
+            lineShapes = lines;
             Type = "CustomShape";
         }
 
-        public CustomShape(Point center, int halfWidth, int halfHeight)
+        public CustomShape(Point center, int halfWidth, int halfHeight, List<LineShape> lines)
         {
-            // We need those Points in all shapes to calculate the width, while dragging
-            //Points = new List<Point>() {
-            //    new Point(center.X - halfWidth, center.Y + halfHeight),
-            //    new Point(center.X + halfWidth, center.Y + halfHeight),
-            //    new Point(center.X, center.Y - halfHeight),
-            //};
-            //ShapeCenter = center;
+            Points = new List<Point>() {
+                new Point(center.X - halfWidth, center.Y - halfHeight),
+                new Point(center.X + halfWidth, center.Y + halfHeight)
+            };
+            ShapeCenter = center;
+            lineShapes = lines;
+            BaseShape = new Rectangle(center.X - halfWidth, center.Y - halfHeight, halfWidth * 2, halfHeight * 2);
             Type = "CustomShape";
         }
 
         // This will be our JSONconstructor for the custom deserialization
         [JsonConstructor]
-        public CustomShape(string[] Points, string ShapeCenter, string DrawnPenColor, bool IsSelected)
+        public CustomShape(string ShapeCenter, string DrawnPenColor, string DrawnPenSize, bool IsSelected)
         {
-            // TODO: If shape is from polygon thne we leave this, if from ellipse or sqare we need to add the Shape property!
-            int[][] PointsNums = Points.Select(arr => arr.Split(", ").Select(int.Parse).ToArray()).ToArray();
-            this.Points = PointsNums.Select(arr => new Point(arr[0], arr[1])).ToList();
-
             int[] ShapeCenterNumbers = ShapeCenter.Split(", ").Select(int.Parse).ToArray();
             this.ShapeCenter = new Point(ShapeCenterNumbers[0], ShapeCenterNumbers[1]);
 
             this.DrawnPenColor = ColorTranslator.FromHtml(DrawnPenColor);
+            this.DrawnPenSize = float.Parse(DrawnPenSize);
 
             this.IsSelected = IsSelected;
 
@@ -44,17 +45,33 @@ namespace PaintGD.Model
 
         public override void DrawShape(Graphics g, Pen p)
         {
-            throw new NotImplementedException();
+            g.DrawEllipse(p, BaseShape);
+            lineShapes.ForEach(line => g.DrawLine(p, line.Points[0], line.Points[1]));
+
+            // We memorize the color and width of the drawn shape
+            DrawnPenColor = p.Color;
+            DrawnPenSize = p.Width;
         }
 
         public override bool IsInBounds(Point click)
         {
-            throw new NotImplementedException();
+            // return if the click is inside the rectangle or not!
+            return BaseShape.Contains(click);
         }
 
         public override void SelectShape(Graphics g)
         {
-            throw new NotImplementedException();
+            this.IsSelected = true;
+
+            // Convert the hexadecimal color string to a Color object
+            string hexColor = "#3399FF";
+            Color color = ColorTranslator.FromHtml(hexColor);
+
+            g.DrawRectangle(new Pen(color, 2), BaseShape);
+
+            // Draw shape center plus sign
+            g.DrawLine(new Pen(Color.Red, 1), new Point(ShapeCenter.X, ShapeCenter.Y - 5), new Point(ShapeCenter.X, ShapeCenter.Y + 5));
+            g.DrawLine(new Pen(Color.Red, 1), new Point(ShapeCenter.X - 5, ShapeCenter.Y), new Point(ShapeCenter.X + 5, ShapeCenter.Y));
         }
     }
 }

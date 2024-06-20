@@ -133,7 +133,21 @@ namespace PaintGD
                             curShape = new TrapezoidShape(newCenter, shapeHalfWidth, shapeHalfHeight, indent);
                             break;
                         case "CustomShape":
-                            //TODO: Create dragging shape, using center constructor
+                            int width = shapeHalfWidth * 2;
+                            int height = shapeHalfHeight * 2;// make it in the middle!
+                            int delimer = width / 7;
+                            int x = newCenter.X;
+                            int y = newCenter.Y;
+
+                            // Different lines when using the constructor from the center of the shape
+                            List<LineShape> lines = new List<LineShape>()
+                            {
+                                new LineShape(x + delimer - shapeHalfWidth, y + delimer - shapeHalfHeight, x + shapeHalfWidth - delimer, y + shapeHalfHeight - delimer),
+                                new LineShape(x, y - shapeHalfHeight, x, y + shapeHalfHeight),
+                                new LineShape(x - delimer + shapeHalfWidth, y + delimer - shapeHalfHeight, x - shapeHalfWidth + delimer, y - delimer + shapeHalfHeight)
+                            };
+
+                            curShape = new CustomShape(newCenter, shapeHalfWidth, shapeHalfHeight, lines);
                             break;
                     }
                 }
@@ -576,7 +590,8 @@ namespace PaintGD
             string pattern = @"""Type"":\s*""([^""]+)""";
 
             // Match the pattern in the JSON string
-            Match match = Regex.Match(obj, pattern);
+            MatchCollection matches = Regex.Matches(obj, pattern);
+            Match match = matches[matches.Count - 1];
 
             // We extract the string Type of the shape
             string shapeType = match.Groups[1].Value;
@@ -678,7 +693,24 @@ namespace PaintGD
         }
         private CustomShape createCustomShape()
         {
-            return null;
+            // We need positive values for the width and height property throughout all code
+            int height = Math.Abs(endLocation.Y - startLocation.Y);
+            int width = height;
+
+            // In order to be able to draw backwards we need to get the correct start for our drawing
+            int x = Math.Min(startLocation.X, endLocation.X);
+            int y = Math.Min(startLocation.Y, endLocation.Y);
+
+            int delimer = width / 7;
+
+            List<LineShape> lines = new List<LineShape>()
+            {
+                new LineShape(x + delimer, y + delimer, x + width - delimer, y + height - delimer),
+                new LineShape(x + (width / 2), y, x + (width / 2), y + height),
+                new LineShape(x + delimer, y + height - delimer, x + width - delimer, y + delimer)
+            };
+
+            return new CustomShape(x, y, width, height, lines);
         }
     }
 }

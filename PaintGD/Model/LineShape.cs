@@ -35,7 +35,7 @@ namespace PaintGD.Model
 
         // This will be our JSONconstructor for the custom deserialization
         [JsonConstructor]
-        public LineShape(string[] Points, string ShapeCenter, string DrawnPenColor, bool IsSelected)
+        public LineShape(string[] Points, string ShapeCenter, string DrawnPenColor, string DrawnPenSize, bool IsSelected)
         {
 
             int[][] PointsNums = Points.Select(arr => arr.Split(", ").Select(int.Parse).ToArray()).ToArray();
@@ -45,6 +45,7 @@ namespace PaintGD.Model
             this.ShapeCenter = new Point(ShapeCenterNumbers[0], ShapeCenterNumbers[1]);
 
             this.DrawnPenColor = ColorTranslator.FromHtml(DrawnPenColor);
+            this.DrawnPenSize = float.Parse(DrawnPenSize);
 
             this.IsSelected = IsSelected;
 
