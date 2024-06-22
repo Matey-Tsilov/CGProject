@@ -378,6 +378,7 @@ namespace PaintGD
                                 new Point(shape.Points[0].X + valueToIncrementSize, shape.Points[0].Y + valueToIncrementSize),
                                 new Point(shape.Points[1].X - valueToIncrementSize, shape.Points[1].Y - valueToIncrementSize)
                             };
+
                         }
                         else if (curentValue < previousSizeScrollValue)
                         {
@@ -516,6 +517,71 @@ namespace PaintGD
                                 new Point(shape.Points[1].X - valueToIncrementSize, shape.Points[1].Y - valueToIncrementSize),
                                 new Point(shape.Points[2].X - valueToIncrementSize, shape.Points[2].Y + valueToIncrementSize),
                                 new Point(shape.Points[3].X + valueToIncrementSize, shape.Points[3].Y + valueToIncrementSize)
+                            };
+                        }
+                        break;
+
+                    case "CustomShape":
+
+                        CustomShape resizeShape = shape as CustomShape;
+
+                        var shapeCenterX = resizeShape.ShapeCenter.X;
+                        var shapeCenterY = resizeShape.ShapeCenter.Y;
+
+                        var xOfShape = resizeShape.BaseShape.X;
+                        var yOfShape = resizeShape.BaseShape.Y;
+
+                        var delimer = resizeShape.BaseShape.Width / 7;
+                        var shapeHalfWidth = resizeShape.BaseShape.Width / 2;
+                        var shapeHalfHeight = resizeShape.BaseShape.Height / 2;
+
+                        // We handle both directions, downsizing or upsizing the shapes
+                        if (curentValue > previousSizeScrollValue)
+                        {
+                            resizeShape.BaseShape = new Rectangle(
+                                xOfShape - valueToIncrementSize,
+                                yOfShape - valueToIncrementSize,
+                                resizeShape.BaseShape.Width + valueToIncrementSize * 2,
+                                resizeShape.BaseShape.Height + valueToIncrementSize * 2);
+
+                            resizeShape.lineShapes = new List<LineShape>()
+                            {
+                                new LineShape(
+                                    shapeCenterX + delimer - shapeHalfWidth,
+                                    shapeCenterY + delimer - shapeHalfHeight,
+                                    shapeCenterX + shapeHalfWidth - delimer,
+                                    shapeCenterY + shapeHalfHeight - delimer
+                                ),
+                                new LineShape(
+                                    shapeCenterX - delimer + shapeHalfWidth,
+                                    shapeCenterY + delimer - shapeHalfHeight,
+                                    shapeCenterX - shapeHalfWidth + delimer,
+                                    shapeCenterY - delimer + shapeHalfHeight
+                                )
+                            };
+                        }
+                        else if (curentValue < previousSizeScrollValue)
+                        {
+                            resizeShape.BaseShape = new Rectangle(
+                                xOfShape + valueToIncrementSize,
+                                resizeShape.BaseShape.Y + valueToIncrementSize,
+                                resizeShape.BaseShape.Width - valueToIncrementSize * 2,
+                                resizeShape.BaseShape.Height - valueToIncrementSize * 2);
+
+                            resizeShape.lineShapes = new List<LineShape>()
+                            {
+                                new LineShape(
+                                    shapeCenterX + delimer - shapeHalfWidth,
+                                    shapeCenterY + delimer - shapeHalfHeight,
+                                    shapeCenterX + shapeHalfWidth - delimer,
+                                    shapeCenterY + shapeHalfHeight - delimer
+                                ),
+                                new LineShape(
+                                    shapeCenterX - delimer + shapeHalfWidth,
+                                    shapeCenterY + delimer - shapeHalfHeight,
+                                    shapeCenterX - shapeHalfWidth + delimer,
+                                    shapeCenterY - delimer + shapeHalfHeight
+                                )
                             };
                         }
                         break;
