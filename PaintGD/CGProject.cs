@@ -134,8 +134,14 @@ namespace PaintGD
                             break;
                         case "CustomShape":
                             int width = shapeHalfWidth * 2;
-                            int height = shapeHalfHeight * 2;// make it in the middle!
+
+                            // This will be the same height like the width
+                            int height = shapeHalfHeight * 2;
+
+                            // This is the small distance between the angles and the shape
                             int delimer = width / 7;
+
+                            // Those are the newCenter values
                             int x = newCenter.X;
                             int y = newCenter.Y;
 
@@ -143,7 +149,6 @@ namespace PaintGD
                             List<LineShape> lines = new List<LineShape>()
                             {
                                 new LineShape(x + delimer - shapeHalfWidth, y + delimer - shapeHalfHeight, x + shapeHalfWidth - delimer, y + shapeHalfHeight - delimer),
-                                new LineShape(x, y - shapeHalfHeight, x, y + shapeHalfHeight),
                                 new LineShape(x - delimer + shapeHalfWidth, y + delimer - shapeHalfHeight, x - shapeHalfWidth + delimer, y - delimer + shapeHalfHeight)
                             };
 
@@ -695,18 +700,20 @@ namespace PaintGD
         {
             // We need positive values for the width and height property throughout all code
             int height = Math.Abs(endLocation.Y - startLocation.Y);
+
+            // The width is the same as the hight because we want a perfect shape
             int width = height;
 
             // In order to be able to draw backwards we need to get the correct start for our drawing
             int x = Math.Min(startLocation.X, endLocation.X);
             int y = Math.Min(startLocation.Y, endLocation.Y);
 
+            // This will be the small distance between the left/right upper/down angles to perfectly pass in the shape
             int delimer = width / 7;
 
             List<LineShape> lines = new List<LineShape>()
             {
                 new LineShape(x + delimer, y + delimer, x + width - delimer, y + height - delimer),
-                new LineShape(x + (width / 2), y, x + (width / 2), y + height),
                 new LineShape(x + delimer, y + height - delimer, x + width - delimer, y + delimer)
             };
 

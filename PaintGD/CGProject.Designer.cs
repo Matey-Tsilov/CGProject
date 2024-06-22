@@ -52,6 +52,7 @@
             button4 = new Button();
             openFileDialog1 = new OpenFileDialog();
             saveFileDialog1 = new SaveFileDialog();
+            DrawCustomShape = new RadioButton();
             ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bindingSource1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trackBar2).BeginInit();
@@ -263,11 +264,23 @@
             // 
             saveFileDialog1.Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*";
             // 
+            // DrawCustomShape
+            // 
+            DrawCustomShape.AutoSize = true;
+            DrawCustomShape.Location = new Point(62, 208);
+            DrawCustomShape.Name = "DrawCustomShape";
+            DrawCustomShape.Size = new Size(121, 24);
+            DrawCustomShape.TabIndex = 23;
+            DrawCustomShape.TabStop = true;
+            DrawCustomShape.Text = "CustomShape";
+            DrawCustomShape.UseVisualStyleBackColor = true;
+            // 
             // CGProject
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1151, 760);
+            Controls.Add(DrawCustomShape);
             Controls.Add(button4);
             Controls.Add(ExportBtn);
             Controls.Add(textBox1);
@@ -324,5 +337,6 @@
         private OpenFileDialog openFileDialog1;
         private SaveFileDialog saveFileDialog1;
         private Label label5;
+        private RadioButton DrawCustomShape;
     }
 }
